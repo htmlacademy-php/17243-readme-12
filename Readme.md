@@ -1,7 +1,7 @@
 # Личный проект «Readme»
 
 * Студент: [Andrey Karamnoff](https://up.htmlacademy.ru/php/12/user/17243).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Попов](https://htmlacademy.ru/profile/id1181399).
 
 ---
 
