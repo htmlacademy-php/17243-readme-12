@@ -43,6 +43,21 @@ $posts = [
     ],
 ];
 
+function truncate($text, $threshold = 300)
+{
+    $words = preg_split("/\s/", html_entity_decode($text));
+
+    $result_str = implode(" ", array_reduce($words, function ($acc, $word) use ($threshold) {
+        if (strlen(implode(" ", $acc)) < $threshold) {
+            $acc[] = $word;
+        }
+
+        return $acc;
+    }, []));
+
+    return strlen($result_str) < $threshold ? [$text, false] : [$result_str, true];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -325,17 +340,24 @@ $posts = [
                             <?php if (isset($post['type'])) : ?>
                                 <?php if ($post['type'] === 'post-quote') : ?>
                                     <blockquote>
-                                        <p>
-                                            <?= $post['body'] ?? '' ?>
-                                        </p>
+                                        <?php if (isset($post['body'])) : ?>
+                                            <?php [$text, $is_truncated] = truncate($post['body']) ?>
+                                            <p>
+                                                <?= $is_truncated ? $text . '&#8230;' : $text ?>
+                                            </p>
+                                            <?= $is_truncated ? '<a class="post-text__more-link" href="#">Читать далее</a>' : '' ?>
+                                        <?php endif; ?>
                                         <cite>Неизвестный Автор</cite>
                                     </blockquote>
 
                                 <?php elseif ($post['type'] === 'post-text') : ?>
-                                    <p>
-                                        <?= $post['body'] ?? '' ?>
-                                    </p>
-
+                                    <?php if (isset($post['body'])) : ?>
+                                        <?php [$text, $is_truncated] = truncate($post['body']) ?>
+                                        <p>
+                                            <?= $is_truncated ? $text . '&#8230;' : $text ?>
+                                        </p>
+                                        <?= $is_truncated ? '<a class="post-text__more-link" href="#">Читать далее</a>' : '' ?>
+                                    <?php endif; ?>
                                 <?php elseif ($post['type'] === 'post-photo') : ?>
                                     <div class="post-photo__image-wrapper">
                                         <img src="img/<?= $post['body'] ?? '' ?>" alt="Фото от пользователя" width="360" height="240">
