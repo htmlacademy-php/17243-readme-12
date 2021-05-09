@@ -1,4 +1,5 @@
 <?php
+require_once('./helpers.php');
 $is_auth = rand(0, 1);
 
 // укажите здесь ваше имя
@@ -27,76 +28,20 @@ $posts = [
         'userpic' => 'userpic-mark.jpg',
     ],
     [
-        'type' => 'post-photo',
-        'title' => 'Моя мечта',
-        'body' => 'coast-medium.jpg',
-        'username' => 'Лариса',
-        'userpic' => 'userpic-larisa-small.jpg',
-    ],
-    [
         'type' => 'post-link',
         'title' => 'Лучшие курсы',
         'body' => 'www.htmlacademy.ru',
         'username' => 'Владик',
         'userpic' => 'userpic.jpg',
     ],
+    [
+        'type' => 'post-video',
+        'title' => 'Моя мечта',
+        'body' => 'https://youtu.be/x3sIRL-weh4',
+        'username' => 'Лариса',
+        'userpic' => 'userpic-larisa-small.jpg',
+    ],
 ];
-
-function render_post_contents_by_type($type, ...$args)
-{
-    [$title, $body] = $args;
-
-    switch ($type) {
-
-        case 'post-quote':
-            return <<<HTML
-            <blockquote>
-                <p>
-                    $body
-                </p>
-                <cite>Неизвестный Автор</cite>
-            </blockquote>
-HTML;
-
-        case 'post-text':
-            return <<<HTML
-                <p>
-                    $body
-                </p>
-HTML;
-
-        case 'post-photo':
-            return <<<HTML
-                <div class="post-photo__image-wrapper">
-                    <img src="img/$body" alt="Фото от пользователя" width="360" height="240">
-                </div>
-HTML;
-
-        case 'post-link':
-            return <<<HTML
-                <div class="post-link__wrapper">
-                    <a class="post-link__external" href="http://$body" title="Перейти по ссылке">
-                        <div class="post-link__info-wrapper">
-                            <div class="post-link__icon-wrapper">
-                                <img src="https://www.google.com/s2/favicons?domain=vitadental.ru" alt="Иконка">
-                            </div>
-                            <div class="post-link__info">
-                                <h3>
-                                    $title
-                                </h3>
-                            </div>
-                        </div>
-                        <span>
-                            $body
-                        </span>
-                    </a>
-                </div>
-HTML;
-
-        default:
-            throw new Exception('Unknown type: ' . $type);
-    }
-}
 
 ?>
 <!DOCTYPE html>
@@ -367,17 +312,70 @@ HTML;
                 </div>
             </div>
             <div class="popular__posts">
-                <?php foreach ($posts as ['type' => $type, 'title' => $title, 'body' => $body, 'username' => $username, 'userpic' => $userpic]) : ?>
-                    <article class="popular__post post <?= $type ?>">
+                <?php foreach ($posts as $post) : ?>
+                    <article class="popular__post post <?= $post['type'] ?? '' ?>">
                         <header class="post__header">
                             <h2>
                                 <!--здесь заголовок-->
-                                <?= $title ?>
+                                <?= $post['title'] ?? '' ?>
                             </h2>
                         </header>
                         <div class="post__main">
                             <!--здесь содержимое карточки-->
-                            <?= render_post_contents_by_type($type, $title, $body) ?>
+                            <?php if (isset($post['type'])) : ?>
+                                <?php if ($post['type'] === 'post-quote') : ?>
+                                    <blockquote>
+                                        <p>
+                                            <?= $post['body'] ?? '' ?>
+                                        </p>
+                                        <cite>Неизвестный Автор</cite>
+                                    </blockquote>
+
+                                <?php elseif ($post['type'] === 'post-text') : ?>
+                                    <p>
+                                        <?= $post['body'] ?? '' ?>
+                                    </p>
+
+                                <?php elseif ($post['type'] === 'post-photo') : ?>
+                                    <div class="post-photo__image-wrapper">
+                                        <img src="img/<?= $post['body'] ?? '' ?>" alt="Фото от пользователя" width="360" height="240">
+                                    </div>
+
+                                <?php elseif ($post['type'] === 'post-link') : ?>
+                                    <div class="post-link__wrapper">
+                                        <a class="post-link__external" href="http://<?= $post['body'] ?? '' ?>" title="Перейти по ссылке">
+                                            <div class="post-link__info-wrapper">
+                                                <div class="post-link__icon-wrapper">
+                                                    <img src="https://www.google.com/s2/favicons?domain=vitadental.ru" alt="Иконка">
+                                                </div>
+                                                <div class="post-link__info">
+                                                    <h3>
+                                                        <?= $post['title'] ?? '' ?>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <span>
+                                                <?= $post['body'] ?? '' ?>
+                                            </span>
+                                        </a>
+                                    </div>
+
+                                <?php elseif ($post['type'] === 'post-video') : ?>
+                                    <div class="post-video__block">
+                                        <div class="post-video__preview">
+                                            <?= embed_youtube_cover($post['body'] ?? '') ?>
+
+                                        </div>
+                                        <a href="post-details.html" class="post-video__play-big button">
+                                            <svg class="post-video__play-big-icon" width="14" height="14">
+                                                <use xlink:href="#icon-video-play-big"></use>
+                                            </svg>
+                                            <span class="visually-hidden">Запустить проигрыватель</span>
+                                        </a>
+                                    </div>
+
+                                <?php endif; ?>
+                            <?php endif; ?>
 
                         </div>
                         <footer class="post__footer">
@@ -385,12 +383,12 @@ HTML;
                                 <a class="post__author-link" href="#" title="Автор">
                                     <div class="post__avatar-wrapper">
                                         <!--укажите путь к файлу аватара-->
-                                        <img class="post__author-avatar" src="img/<?= $userpic ?>" alt="Аватар пользователя">
+                                        <img class="post__author-avatar" src="img/<?= $post['userpic'] ?? '' ?>" alt="Аватар пользователя">
                                     </div>
                                     <div class="post__info">
                                         <b class="post__author-name">
                                             <!--здесь имя пользоателя-->
-                                            <?= $username ?>
+                                            <?= $post['username'] ?? '' ?>
                                         </b>
                                         <time class="post__time" datetime="">дата</time>
                                     </div>
