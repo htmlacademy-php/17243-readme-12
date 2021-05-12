@@ -284,3 +284,47 @@ function esc($str)
 {
     return strip_tags($str);
 }
+
+/**
+ * @param $dt
+ * @return object
+ */
+function get_date_diff($dt)
+{
+    return date_diff(date_create($dt), date_create('now'));
+}
+
+/**
+ * @param $dt
+ * @return string
+ */
+function get_human_readable_date($dt)
+{
+    $dt_dict = [
+        'i' => ['one' => 'минута', 'two' => 'минуты', 'many' => 'минут'],
+        'h' => ['one' => 'час', 'two' => 'часа', 'many' => 'часов'],
+        'd' => [
+            'day' => ['one' => 'день', 'two' => 'дня', 'many' => 'дней'],
+            'week' => ['one' => 'неделя', 'two' => 'недели', 'many' => 'недель'],
+        ],
+        'm' => ['one' => 'месяц', 'two' => 'месяца', 'many' => 'месяцев'],
+    ];
+
+    $dt_diff = get_date_diff($dt);
+    $dt_mapped = array_filter(array_slice(get_object_vars($dt_diff), 0, 6));
+    $key = current(array_keys($dt_mapped));
+    $value = current(array_values($dt_mapped));
+    $DAY_THRESHOLD = 7;
+
+    if ($key === 'd') {
+        if ($value < $DAY_THRESHOLD) {
+            extract($dt_dict[$key]['day']);
+        } else if ($value >= $day_threshold) {
+            extract($dt_dict[$key]['week']);
+        }
+    } else {
+        extract($dt_dict[$key]);
+    }
+
+    return $value . '&nbsp;' . get_noun_plural_form($value, $one, $two, $many) . '&nbsp;' . 'назад';
+}
