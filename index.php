@@ -1,10 +1,8 @@
 <?php
 require_once('./helpers.php');
+
 $is_auth = rand(0, 1);
-
-// укажите здесь ваше имя
 $user_name = 'Андрей';
-
 $posts = [
     [
         'type' => 'post-quote',
@@ -42,8 +40,6 @@ $posts = [
         'userpic' => 'userpic-larisa-small.jpg',
     ],
 ];
-
-array_walk_recursive($posts, 'esc');
 
 function truncate($text, $threshold = 300)
 {

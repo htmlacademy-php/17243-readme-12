@@ -280,7 +280,7 @@ function dd(...$args)
  * @param $str
  * @return string
  */
-function esc(&$str)
+function esc($str)
 {
-    return htmlspecialchars($str);
+    return strip_tags($str);
 }

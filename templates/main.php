@@ -90,7 +90,7 @@
                     <header class="post__header">
                         <h2>
                             <!--здесь заголовок-->
-                            <?= $post['title'] ?? '' ?>
+                            <?= esc($post['title']) ?? '' ?>
                         </h2>
                     </header>
                     <div class="post__main">
@@ -99,7 +99,7 @@
                             <?php if ($post['type'] === 'post-quote') : ?>
                                 <blockquote>
                                     <?php if (isset($post['body'])) : ?>
-                                        <?php [$text, $is_truncated] = truncate($post['body']) ?>
+                                        <?php [$text, $is_truncated] = truncate(esc($post['body'])) ?>
                                         <p>
                                             <?= $is_truncated ? $text . '&#8230;' : $text ?>
                                         </p>
@@ -110,7 +110,7 @@
 
                             <?php elseif ($post['type'] === 'post-text') : ?>
                                 <?php if (isset($post['body'])) : ?>
-                                    <?php [$text, $is_truncated] = truncate($post['body']) ?>
+                                    <?php [$text, $is_truncated] = truncate(esc($post['body'])) ?>
                                     <p>
                                         <?= $is_truncated ? $text . '&#8230;' : $text ?>
                                     </p>
@@ -118,24 +118,24 @@
                                 <?php endif; ?>
                             <?php elseif ($post['type'] === 'post-photo') : ?>
                                 <div class="post-photo__image-wrapper">
-                                    <img src="img/<?= $post['body'] ?? '' ?>" alt="Фото от пользователя" width="360" height="240">
+                                    <img src="img/<?= esc($post['body']) ?? '' ?>" alt="Фото от пользователя" width="360" height="240">
                                 </div>
 
                             <?php elseif ($post['type'] === 'post-link') : ?>
                                 <div class="post-link__wrapper">
-                                    <a class="post-link__external" href="http://<?= $post['body'] ?? '' ?>" title="Перейти по ссылке">
+                                    <a class="post-link__external" href="http://<?= esc($post['body']) ?? '' ?>" title="Перейти по ссылке">
                                         <div class="post-link__info-wrapper">
                                             <div class="post-link__icon-wrapper">
                                                 <img src="https://www.google.com/s2/favicons?domain=vitadental.ru" alt="Иконка">
                                             </div>
                                             <div class="post-link__info">
                                                 <h3>
-                                                    <?= $post['title'] ?? '' ?>
+                                                    <?= esc($post['title']) ?? '' ?>
                                                 </h3>
                                             </div>
                                         </div>
                                         <span>
-                                            <?= $post['body'] ?? '' ?>
+                                            <?= esc($post['body']) ?? '' ?>
                                         </span>
                                     </a>
                                 </div>
@@ -143,7 +143,7 @@
                             <?php elseif ($post['type'] === 'post-video') : ?>
                                 <div class="post-video__block">
                                     <div class="post-video__preview">
-                                        <?= embed_youtube_cover($post['body'] ?? '') ?>
+                                        <?= embed_youtube_cover(esc($post['body']) ?? '') ?>
 
                                     </div>
                                     <a href="post-details.html" class="post-video__play-big button">
