@@ -275,3 +275,12 @@ function dd(...$args)
     var_dump(...$args);
     die();
 }
+
+/**
+ * @param $str
+ * @return string
+ */
+function esc($str)
+{
+    return strip_tags($str);
+}
