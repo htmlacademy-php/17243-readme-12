@@ -1,4 +1,5 @@
 <?php
+require_once('./config.php');
 
 /**
  * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД'
@@ -283,4 +284,62 @@ function dd(...$args)
 function esc($str)
 {
     return strip_tags($str);
+}
+
+/**
+ * @param $dt
+ * @return object
+ */
+function get_dates_diff($dt_end, $dt_begin = 'now')
+{
+    return date_diff(date_create($dt_end), date_create($dt_begin));
+}
+
+/**
+ * Преобразует экземпляр даты в урезанную версию ассоциативного массива,
+ * ключам которого соответствует коллекция слова с требуемым склонением.
+ * Склонение определяется числовым значением по ключу,
+ * которое передается вспомогательной функции.
+ * @param $dt
+ * @return string
+ */
+function get_human_readable_date($dt = 'now')
+{
+    $dt_dict = [
+        'i' => ['one' => 'минута', 'two' => 'минуты', 'many' => 'минут'],
+        'h' => ['one' => 'час', 'two' => 'часа', 'many' => 'часов'],
+        'd' => [
+            'day' => ['one' => 'день', 'two' => 'дня', 'many' => 'дней'],
+            'week' => ['one' => 'неделя', 'two' => 'недели', 'many' => 'недель'],
+        ],
+        'm' => ['one' => 'месяц', 'two' => 'месяца', 'many' => 'месяцев'],
+    ];
+
+    $get_interval_name = function ($value, $threshold = 7) {
+        if ($value < $threshold) {
+            return 'day';
+        } else if ($value >= $threshold) {
+            return 'week';
+        }
+    };
+
+    $dt_diff = get_dates_diff($dt);
+    $dt_mapped = array_filter(array_slice(get_object_vars($dt_diff), 0, 6));
+    $key = current(array_keys($dt_mapped));
+    $value = current(array_values($dt_mapped));
+
+    if ($key) {
+        if ($key === 'd') {
+            $interval_name = $get_interval_name($value);
+            ['one' => $one, 'two' => $two, 'many' => $many] = $dt_dict[$key][$interval_name];
+        } else {
+            ['one' => $one, 'two' => $two, 'many' => $many] = $dt_dict[$key];
+        }
+
+        $noun_plural_form = get_noun_plural_form($value, $one, $two, $many);
+
+        return "{$value} {$noun_plural_form} назад";
+    }
+
+    return '';
 }
