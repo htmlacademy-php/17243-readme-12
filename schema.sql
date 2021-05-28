@@ -24,9 +24,9 @@ CREATE UNIQUE INDEX `email_UNIQUE` ON `readme`.`users` (`email` ASC);
 CREATE UNIQUE INDEX `login_UNIQUE` ON `readme`.`users` (`login` ASC);
 
 -- -----------------------------------------------------
--- Table `readme`.`content_type`
+-- Table `readme`.`content_types`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `readme`.`content_type` (
+CREATE TABLE IF NOT EXISTS `readme`.`content_types` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NULL,
   `classname` VARCHAR(255) NULL,
@@ -47,16 +47,16 @@ CREATE TABLE IF NOT EXISTS `readme`.`posts` (
   `link` TEXT NULL,
   `views_count` INT NULL DEFAULT 0,
   `users_id` INT NOT NULL,
-  `content_type_id` INT NOT NULL,
+  `content_types_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_posts_users` FOREIGN KEY (`users_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_posts_content_type` FOREIGN KEY (`content_type_id`) REFERENCES `readme`.`content_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_posts_content_types` FOREIGN KEY (`content_types_id`) REFERENCES `readme`.`content_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 /* indexes */
 CREATE INDEX `fk_posts_users_idx` ON `readme`.`posts` (`users_id` ASC);
 
-CREATE INDEX `fk_posts_content_type_idx` ON `readme`.`posts` (`content_type_id` ASC);
+CREATE INDEX `fk_posts_content_types_idx` ON `readme`.`posts` (`content_types_id` ASC);
 
 -- -----------------------------------------------------
 -- Table `readme`.`comments`
@@ -78,32 +78,32 @@ CREATE INDEX `fk_comments_posts_idx` ON `readme`.`comments` (`posts_id` ASC);
 CREATE INDEX `fk_comments_users_idx` ON `readme`.`comments` (`users_id` ASC);
 
 -- -----------------------------------------------------
--- Table `readme`.`like`
+-- Table `readme`.`likes`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `readme`.`like` (
+CREATE TABLE IF NOT EXISTS `readme`.`likes` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `users_id` INT NOT NULL,
   `posts_id` INT NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_like_users` FOREIGN KEY (`users_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `CASCADEosts` FOREIGN KEY (`posts_id`) REFERENCES `readme`.`posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_likes_users` FOREIGN KEY (`users_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_likes_posts` FOREIGN KEY (`posts_id`) REFERENCES `readme`.`posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 /* indexes */
-CREATE INDEX `fk_like_users_idx` ON `readme`.`like` (`users_id` ASC);
+CREATE INDEX `fk_likes_users_idx` ON `readme`.`likes` (`users_id` ASC);
 
-CREATE INDEX `fk_like_posts_idx` ON `readme`.`like` (`posts_id` ASC);
+CREATE INDEX `fk_likes_posts_idx` ON `readme`.`likes` (`posts_id` ASC);
 
 -- -----------------------------------------------------
--- Table `readme`.`subscription`
+-- Table `readme`.`subscriptions`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `readme`.`subscription` (
+CREATE TABLE IF NOT EXISTS `readme`.`subscriptions` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `subscriber_id` INT NOT NULL,
-  `user_id` INT NOT NULL,
+  `subscribers_id` INT NOT NULL,
+  `users_id` INT NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_subscription_subscriber` FOREIGN KEY (`subscriber_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_subscription_user` FOREIGN KEY (`user_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_subscriptions_subscriber` FOREIGN KEY (`subscribers_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_subscriptions_user` FOREIGN KEY (`users_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- -----------------------------------------------------
@@ -126,26 +126,26 @@ CREATE INDEX `fk_messages_sender_idx` ON `readme`.`messages` (`sender_id` ASC);
 CREATE INDEX `fk_messages_recipient_idx` ON `readme`.`messages` (`recipient_id` ASC);
 
 -- -----------------------------------------------------
--- Table `readme`.`hashtag`
+-- Table `readme`.`hashtags`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `readme`.`hashtag` (
+CREATE TABLE IF NOT EXISTS `readme`.`hashtags` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NULL,
   PRIMARY KEY (`id`)
 );
 
 -- -----------------------------------------------------
--- Table `readme`.`posts_has_hashtag`
+-- Table `readme`.`posts_has_hashtags`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `readme`.`posts_has_hashtag` (
+CREATE TABLE IF NOT EXISTS `readme`.`posts_has_hashtags` (
   `posts_id` INT NOT NULL,
-  `hashtag_id` INT NOT NULL,
-  PRIMARY KEY (`posts_id`, `hashtag_id`),
-  CONSTRAINT `fk_posts_has_hashtag_posts` FOREIGN KEY (`posts_id`) REFERENCES `readme`.`posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_posts_has_hashtag_hashtag` FOREIGN KEY (`hashtag_id`) REFERENCES `readme`.`hashtag` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `hashtags_id` INT NOT NULL,
+  PRIMARY KEY (`posts_id`, `hashtags_id`),
+  CONSTRAINT `fk_posts_has_hashtags_posts` FOREIGN KEY (`posts_id`) REFERENCES `readme`.`posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_posts_has_hashtags_hashtags` FOREIGN KEY (`hashtags_id`) REFERENCES `readme`.`hashtags` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 /* indexes */
-CREATE INDEX `fk_posts_has_hashtag_hashtag_idx` ON `readme`.`posts_has_hashtag` (`hashtag_id` ASC);
+CREATE INDEX `fk_posts_has_hashtags_hashtags_idx` ON `readme`.`posts_has_hashtags` (`hashtags_id` ASC);
 
-CREATE INDEX `fk_posts_has_hashtag_posts_idx` ON `readme`.`posts_has_hashtag` (`posts_id` ASC);
+CREATE INDEX `fk_posts_has_hashtags_posts_idx` ON `readme`.`posts_has_hashtags` (`posts_id` ASC);
