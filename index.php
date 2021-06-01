@@ -3,47 +3,50 @@ require_once('./helpers.php');
 $db = require_once('config/db.php');
 
 $link = mysqli_connect($db['host'], $db['user'], $db['password'], $db['database'], $db['port']);
-if ($link) {
-    mysqli_set_charset($link, "utf8");
+if (!$link) {
+    echo "Cannot connect to database";
+    die();
+}
 
-    $content_types = [];
-    $posts = [];
-    $content_types_query = 'SELECT * FROM content_types';
-    $posts_query = '
-    SELECT
-        classname,
-        title,
-        body,
-        login AS username,
-        avatar_path AS userpic
-    FROM
-        posts AS p
-        INNER JOIN users AS u ON p.users_id = u.id
-        INNER JOIN content_types AS c ON c.id = p.content_types_id
-    ORDER BY
-        views_count DESC
+mysqli_set_charset($link, "utf8");
+
+$content_types = [];
+$posts = [];
+$content_types_query = 'SELECT * FROM content_types';
+$posts_query = '
+SELECT
+    classname,
+    title,
+    body,
+    login AS username,
+    avatar_path AS userpic
+FROM
+    posts AS p
+    INNER JOIN users AS u ON p.users_id = u.id
+    INNER JOIN content_types AS c ON c.id = p.content_types_id
+ORDER BY
+    views_count DESC
 ';
 
-    /* $content_types  */
-    $result = mysqli_query($link, $content_types_query);
+/* $content_types  */
+$result = mysqli_query($link, $content_types_query);
 
-    if ($result) {
-        $content_types = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    };
+if ($result) {
+    $content_types = mysqli_fetch_all($result, MYSQLI_ASSOC);
+};
 
-    /* $posts  */
-    $result = mysqli_query($link, $posts_query);
+/* $posts  */
+$result = mysqli_query($link, $posts_query);
 
-    if ($result) {
-        $posts = array_map(function ($post) {
-            ['classname' => $type] = $post;
+if ($result) {
+    $posts = array_map(function ($post) {
+        ['classname' => $type] = $post;
 
-            return array_merge(
-                ['type' => "post-{$type}"],
-                array_slice($post, 1)
-            );
-        }, mysqli_fetch_all($result, MYSQLI_ASSOC));
-    }
+        return array_merge(
+            ['type' => "post-{$type}"],
+            array_slice($post, 1)
+        );
+    }, mysqli_fetch_all($result, MYSQLI_ASSOC));
 }
 
 $is_auth = rand(0, 1);
