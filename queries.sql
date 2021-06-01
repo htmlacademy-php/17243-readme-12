@@ -5,11 +5,11 @@
 INSERT INTO
   content_types (name, classname)
 VALUES
-  ('quote', 'post-quote'),
-  ('text', 'post-text'),
-  ('photo', 'post-photo'),
-  ('link', 'post-link'),
-  ('video', 'post-video');
+  ('Цитата', 'quote'),
+  ('Текст', 'text'),
+  ('Картинка', 'photo'),
+  ('Ссылка', 'link'),
+  ('Видео', 'video');
 
 /* users */
 INSERT INTO
@@ -30,51 +30,41 @@ VALUES
 
 /* posts */
 INSERT INTO
-  posts (title, quote, users_id, content_types_id)
+  posts (title, body, users_id, content_types_id)
 VALUES
   (
     'Цитата',
     'Мы&nbsp;в&nbsp;жизни любим только раз, а&nbsp;после ищем лишь похожих',
     1,
     1
-  );
-
-INSERT INTO
-  posts (title, text, users_id, content_types_id)
-VALUES
+  ),
   (
     'Игра престолов',
     'Не&nbsp;могу дождаться начала финального сезона своего любимого сериала!',
     1,
     2
-  );
-
-INSERT INTO
-  posts (title, photo, users_id, content_types_id)
-VALUES
+  ),
   (
     'Наконец, обработал фотки!',
     'rock-medium.jpg',
     1,
     3
-  );
-
-INSERT INTO
-  posts (title, link, users_id, content_types_id)
-VALUES
+  ),
   (
     'Лучшие курсы',
     'www.htmlacademy.ru',
     2,
     4
-  );
-
-INSERT INTO
-  posts (title, video, users_id, content_types_id)
-VALUES
+  ),
   (
     'Моя мечта',
     'https://youtu.be/x3sIRL-weh4',
+    2,
+    5
+  ),
+  (
+    'Лучшее место на&nbsp;земле!',
+    'https://youtu.be/hYFXDqI-etU',
     2,
     5
   );
@@ -84,11 +74,7 @@ INSERT INTO
   comments (`text`, `posts_id`, `users_id`)
 VALUES
   ('Неплохо!', 1, 1),
-  ('Кто автор?', 1, 1);
-
-INSERT INTO
-  comments (text, posts_id, users_id)
-VALUES
+  ('Кто автор?', 1, 1),
   (
     'Я тоже, жду с нетерпением!',
     2,
@@ -98,23 +84,11 @@ VALUES
     'Какой-то новый сериал? Впервые слышу.',
     2,
     1
-  );
-
-INSERT INTO
-  comments (text, posts_id, users_id)
-VALUES
+  ),
   ('Интересный ракурс!', 3, 1),
-  ('Завалена перспектива', 3, 1);
-
-INSERT INTO
-  comments (text, posts_id, users_id)
-VALUES
+  ('Завалена перспектива', 3, 1),
   ('Еще одна online-школа…', 4, 2),
-  ('Учился у них?', 4, 2);
-
-INSERT INTO
-  comments (text, posts_id, users_id)
-VALUES
+  ('Учился у них?', 4, 2),
   ('Эпичный видос.', 5, 2),
   ('Красивые пейзажи', 5, 2);
 
