@@ -1,5 +1,5 @@
 <?php
-require_once('./config.php');
+require_once('./config/date_timezone_and_locale.php');
 
 /**
  * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД'
