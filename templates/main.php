@@ -42,7 +42,6 @@
                         </a>
                     </li>
                     <?php foreach ($content_types as $key => $content_type) : ?>
-
                         <li class="popular__filters-item filters__item">
                             <a class="filters__button filters__button<?= "--" . ($content_type['classname'] ? esc($content_type['classname']) : '') ?> button" href="#">
                                 <span class="visually-hidden"><?= esc($content_type['name']) ?? '' ?></span>
