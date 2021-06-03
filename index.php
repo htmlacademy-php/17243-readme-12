@@ -1,32 +1,27 @@
 <?php
-require_once('./helpers.php');
-$db = require_once('config/db.php');
+require_once('./config/init.php');
 
-$link = mysqli_connect($db['host'], $db['user'], $db['password'], $db['database'], $db['port']);
-if (!$link) {
-    echo "Cannot connect to database";
-    die();
-}
-
-mysqli_set_charset($link, "utf8");
-
+$id = filter_input(INPUT_GET, 'id');
 $content_types = [];
 $posts = [];
+$subquery = is_null($id) ? 'p.content_types_id = c.id' : 'p.content_types_id = ' . intval($id);
 $content_types_query = 'SELECT * FROM content_types';
-$posts_query = '
+$posts_query = "
 SELECT
-    classname,
-    title,
-    body,
-    login AS username,
-    avatar_path AS userpic
+    c.classname,
+    p.id,
+    p.title,
+    p.body,
+    u.login AS username,
+    u.avatar_path AS userpic
 FROM
     posts AS p
     INNER JOIN users AS u ON p.users_id = u.id
     INNER JOIN content_types AS c ON c.id = p.content_types_id
+WHERE $subquery
 ORDER BY
     views_count DESC
-';
+";
 
 /* $content_types  */
 $result = mysqli_query($link, $content_types_query);
@@ -67,8 +62,8 @@ function truncate($text, $threshold = 300)
     return strlen($result_str) < $threshold ? [$text, false] : [$result_str, true];
 }
 
-$page_content = include_template('main.php', ['posts' => $posts, 'content_types' => $content_types]);
-$layout_content = include_template('layout.php', [
+$page_content = include_template('partials/index/main.php', ['posts' => $posts, 'content_types' => $content_types, 'params' => ['content_type_id' => $id]]);
+$layout_content = include_template('partials/index/layout.php', [
     'page_content' => $page_content,
     'title' => 'readme: популярное',
     'username' => $user_name,
