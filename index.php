@@ -44,9 +44,6 @@ if ($result) {
     }, mysqli_fetch_all($result, MYSQLI_ASSOC));
 }
 
-$is_auth = rand(0, 1);
-$user_name = 'Андрей';
-
 function truncate($text, $threshold = 300)
 {
     $words = preg_split("/\s/", html_entity_decode($text));
@@ -62,12 +59,17 @@ function truncate($text, $threshold = 300)
     return strlen($result_str) < $threshold ? [$text, false] : [$result_str, true];
 }
 
+$head = include_template('head.php', ['title' => 'readme: популярное']);
+$symbols = include_template('symbols.php');
+$page_header = include_template('header.php', ['is_auth' => $is_auth]);
 $page_content = include_template('partials/index/main.php', ['posts' => $posts, 'content_types' => $content_types, 'params' => ['content_type_id' => $id]]);
+$page_footer = include_template('footer.php');
 $layout_content = include_template('partials/index/layout.php', [
+    'head' => $head,
+    'symbols' => $symbols,
+    'page_header' => $page_header,
     'page_content' => $page_content,
-    'title' => 'readme: популярное',
-    'username' => $user_name,
-    'is_auth' => $is_auth,
+    'page_footer' => $page_footer,
 ]);
 
 print($layout_content);
