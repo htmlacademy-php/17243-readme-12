@@ -1,7 +1,7 @@
 <?php
 require_once('./config/init.php');
 
-$id = filter_input(INPUT_GET, 'id');
+$id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 $content_types = [];
 $posts = [];
 $subquery = is_null($id) ? 'p.content_types_id = c.id' : 'p.content_types_id = ' . intval($id);
@@ -59,11 +59,11 @@ function truncate($text, $threshold = 300)
     return strlen($result_str) < $threshold ? [$text, false] : [$result_str, true];
 }
 
-$head = include_template('head.php', ['title' => 'readme: популярное']);
-$symbols = include_template('symbols.php');
-$page_header = include_template('header.php', ['is_auth' => $is_auth]);
+$head = include_template('partials/head.php', ['title' => 'readme: популярное']);
+$symbols = include_template('partials/symbols.php');
+$page_header = include_template('partials/header.php', ['is_auth' => $is_auth]);
 $page_content = include_template('partials/index/main.php', ['posts' => $posts, 'content_types' => $content_types, 'params' => ['content_type_id' => $id]]);
-$page_footer = include_template('footer.php');
+$page_footer = include_template('partials/footer.php');
 $layout_content = include_template('partials/index/layout.php', [
     'head' => $head,
     'symbols' => $symbols,

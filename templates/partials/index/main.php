@@ -151,7 +151,7 @@
                                         <?= $post['username'] ?? '' ?>
                                     </b>
                                     <?php $random_date = generate_random_date($key) ?>
-                                    <time class="post__time" title="<?= date_format(date_create($random_date), 'd-m-Y H:i') ?>" datetime="<?= $random_date ?>"><?= get_human_readable_date($random_date) ?></time>
+                                    <time class="post__time" title="<?= date_format(date_create($random_date), 'd-m-Y H:i') ?>" datetime="<?= $random_date ?>"><?= get_human_readable_date($random_date) . '&nbsp;' . 'назад' ?></time>
                                 </div>
                             </a>
                         </div>

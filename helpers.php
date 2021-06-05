@@ -338,7 +338,7 @@ function get_human_readable_date($dt = 'now')
 
         $noun_plural_form = get_noun_plural_form($value, $one, $two, $many);
 
-        return "{$value} {$noun_plural_form} назад";
+        return "{$value} {$noun_plural_form}";
     }
 
     return '';

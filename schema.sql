@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `readme`.`content_types` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `readme`.`posts` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `original_post_id` INT,
   `dt_add` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   `title` TEXT NOT NULL,
   `body` TEXT NULL,
@@ -47,7 +48,11 @@ CREATE TABLE IF NOT EXISTS `readme`.`posts` (
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_posts_users` FOREIGN KEY (`users_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_posts_content_types` FOREIGN KEY (`content_types_id`) REFERENCES `readme`.`content_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_posts` FOREIGN KEY (`original_post_id`) REFERENCES `readme`.`posts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 );
+
+ALTER TABLE `readme`.`posts`
+ADD 'original_post_id' INT NULL;
 
 /* indexes */
 CREATE INDEX `fk_posts_users_idx` ON `readme`.`posts` (`users_id` ASC);
