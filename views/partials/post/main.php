@@ -45,18 +45,16 @@
                                 <svg class="post__indicator-icon" width="19" height="17">
                                     <use xlink:href="#icon-repost"></use>
                                 </svg>
-                                <span><?= intval($post['original_post_id']) ?></span>
+                                <span><?= $post['original_post_id'] ?></span>
                                 <span class="visually-hidden">количество репостов</span>
                             </a>
                         </div>
                         <span class="post__view"><?= $post['views_count'] . '&nbsp' . get_noun_plural_form($post['views_count'], 'просмотр', 'просмотра', 'просмотров') ?></span>
                     </div>
                     <ul class="post__tags">
-                        <?php if ($hashtags) : ?>
-                            <?php foreach ($hashtags as $key => $value) : ?>
-                                <li><a href="#"><?= esc($value) ?></a></li>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                        <?php foreach ($hashtags as $key => $value) : ?>
+                            <li><a href="#"><?= esc($value) ?></a></li>
+                        <?php endforeach; ?>
                     </ul>
                     <div class="comments">
                         <form class="comments__form form" action="#" method="post">
