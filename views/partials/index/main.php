@@ -37,13 +37,22 @@
                 <b class="popular__filters-caption filters__caption">Тип контента:</b>
                 <ul class="popular__filters-list filters__list">
                     <li class="popular__filters-item popular__filters-item--all filters__item filters__item--all">
-                        <a class="filters__button filters__button--ellipse filters__button--all filters__button--active" href="#">
+                        <a class="
+                            filters__button
+                            filters__button--ellipse filters__button--all
+                            <?= is_null($params['content_type_id']) ? 'filters__button--active' : '' ?>
+                            " href="/index.php">
                             <span>Все</span>
                         </a>
                     </li>
                     <?php foreach ($content_types as $key => $content_type) : ?>
                         <li class="popular__filters-item filters__item">
-                            <a class="filters__button filters__button<?= "--" . ($content_type['classname'] ? esc($content_type['classname']) : '') ?> button" href="#">
+                            <a class="
+                                filters__button
+                                filters__button<?= "--" . ($content_type['classname'] ? esc($content_type['classname']) : '') ?>
+                                <?= $content_type['id'] === $params['content_type_id'] ? 'filters__button--active' : '' ?>
+                                button
+                                " href="/index.php?id=<?= $content_type['id'] ?>">
                                 <span class="visually-hidden"><?= esc($content_type['name']) ?? '' ?></span>
                                 <svg class="filters__icon" width="24">
                                     <use xlink:href="#icon-filter<?= "-" . ($content_type['classname'] ? esc($content_type['classname']) : '') ?>"></use>
@@ -58,10 +67,11 @@
             <?php foreach ($posts as $key => $post) : ?>
                 <article class="popular__post post <?= $post['type'] ?? '' ?>">
                     <header class="post__header">
-                        <h2>
-                            <!--здесь заголовок-->
-                            <?= esc($post['title']) ?? '' ?>
-                        </h2>
+                        <a href="/post.php?id=<?= $post['id'] ?>">
+                            <h2>
+                                <?= esc($post['title']) ?? '' ?>
+                            </h2>
+                        </a>
                     </header>
                     <div class="post__main">
                         <!--здесь содержимое карточки-->
@@ -141,7 +151,7 @@
                                         <?= $post['username'] ?? '' ?>
                                     </b>
                                     <?php $random_date = generate_random_date($key) ?>
-                                    <time class="post__time" title="<?= date_format(date_create($random_date), 'd-m-Y H:i') ?>" datetime="<?= $random_date ?>"><?= get_human_readable_date($random_date) ?></time>
+                                    <time class="post__time" title="<?= date_format(date_create($random_date), 'd-m-Y H:i') ?>" datetime="<?= $random_date ?>"><?= get_human_readable_date($random_date) . '&nbsp;' . 'назад' ?></time>
                                 </div>
                             </a>
                         </div>
