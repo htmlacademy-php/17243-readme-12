@@ -1,4 +1,6 @@
 <?php
+require_once('./helpers.php');
+
 function get_user_details_by_id($con, $id): ?array
 {
     $sql = "
@@ -28,8 +30,7 @@ function get_user_details_by_id($con, $id): ?array
             AND p.id = ?
 ";
 
-    $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, 'i', $id);
+    $stmt = db_get_prepare_stmt($con, $sql, [$id]);
     mysqli_stmt_execute($stmt);
 
     $result = mysqli_stmt_get_result($stmt);

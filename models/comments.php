@@ -1,4 +1,6 @@
 <?php
+require_once('./helpers.php');
+
 function get_post_comments_by_id($con, int $id): ?array
 {
     $sql = "
@@ -14,8 +16,7 @@ function get_post_comments_by_id($con, int $id): ?array
         INNER JOIN users AS c2 ON c2.id = c1.users_id;
 ";
 
-    $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, 'i', $id);
+    $stmt = db_get_prepare_stmt($con, $sql, [$id]);
     mysqli_stmt_execute($stmt);
 
     $result = mysqli_stmt_get_result($stmt);
