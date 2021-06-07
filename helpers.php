@@ -134,7 +134,7 @@ function get_noun_plural_form(int $number, string $one, string $two, string $man
  */
 function include_template($name, array $data = [])
 {
-    $name = 'templates/' . $name;
+    $name = 'views/' . $name;
     $result = '';
 
     if (!is_readable($name)) {
@@ -342,4 +342,24 @@ function get_human_readable_date($dt = 'now')
     }
 
     return '';
+}
+
+/**
+ * @param $text
+ * @param $threshold
+ * @return string
+ */
+function truncate($text, $threshold = 300)
+{
+    $words = preg_split("/\s/", html_entity_decode($text));
+
+    $result_str = implode(" ", array_reduce($words, function ($acc, $word) use ($threshold) {
+        if (strlen(implode(" ", $acc)) < $threshold) {
+            $acc[] = $word;
+        }
+
+        return $acc;
+    }, []));
+
+    return strlen($result_str) < $threshold ? [$text, false] : [$result_str, true];
 }
