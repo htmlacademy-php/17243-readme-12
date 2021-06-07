@@ -14,8 +14,8 @@ function get_posts($con): ?array
             c1.classname AS type
         FROM
             posts AS p
-            INNER JOIN content_types AS c1 ON p.content_types_id = c1.id
-            INNER JOIN comments AS c2 ON p.id = c2.posts_id
+            LEFT JOIN content_types AS c1 ON p.content_types_id = c1.id
+            LEFT JOIN comments AS c2 ON p.id = c2.posts_id
             LEFT JOIN likes AS l ON p.id = l.posts_id
         GROUP BY p.id;
     ';
@@ -33,7 +33,7 @@ function get_posts($con): ?array
 
 function get_posts_by_id($con, ?int $id): ?array
 {
-    $subquery = is_null($id) ? 'p.content_types_id = c.id' : 'p.content_types_id = ' . $id;
+    $subquery = is_null($id) ? "p.content_types_id = c.id" : "p.id = $id";
 
     $sql = "
         SELECT
