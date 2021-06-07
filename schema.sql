@@ -47,12 +47,9 @@ CREATE TABLE IF NOT EXISTS `readme`.`posts` (
   `content_types_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_posts_users` FOREIGN KEY (`users_id`) REFERENCES `readme`.`users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_posts_content_types` FOREIGN KEY (`content_types_id`) REFERENCES `readme`.`content_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_posts_content_types` FOREIGN KEY (`content_types_id`) REFERENCES `readme`.`content_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_posts` FOREIGN KEY (`original_post_id`) REFERENCES `readme`.`posts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 );
-
-ALTER TABLE `readme`.`posts`
-ADD 'original_post_id' INT NULL;
 
 /* indexes */
 CREATE INDEX `fk_posts_users_idx` ON `readme`.`posts` (`users_id` ASC);
