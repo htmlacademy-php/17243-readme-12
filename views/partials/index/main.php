@@ -49,14 +49,16 @@
                         <li class="popular__filters-item filters__item">
                             <a class="
                                 filters__button
-                                filters__button<?= "--" . ($content_type['classname'] ? esc($content_type['classname']) : '') ?>
+                                <?= $content_type['classname'] ? 'filters__button--' . esc($content_type['classname']) : '' ?>
                                 <?= $content_type['id'] === $params['content_type_id'] ? 'filters__button--active' : '' ?>
                                 button
                                 " href="/index.php?id=<?= $content_type['id'] ?>">
                                 <span class="visually-hidden"><?= esc($content_type['name']) ?? '' ?></span>
-                                <svg class="filters__icon" width="24">
-                                    <use xlink:href="#icon-filter<?= "-" . ($content_type['classname'] ? esc($content_type['classname']) : '') ?>"></use>
-                                </svg>
+                                <?php if ($content_type['classname']) : ?>
+                                    <svg class="filters__icon" width="24" height="100%">
+                                        <use xlink:href="#icon-filter<?= "-" . esc($content_type['classname']) ?>"></use>
+                                    </svg>
+                                <?php endif; ?>
                             </a>
                         </li>
                     <?php endforeach; ?>

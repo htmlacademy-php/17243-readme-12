@@ -9,15 +9,15 @@
                 <div class="post-details__main-block post post--details">
                     <?php if (isset($post['type'])) : ?>
                         <?php if ($post['type'] === 'quote') : ?>
-                            <?= include_template('partials/post/types/quote.php', ['text' => $post['body'], 'author' => 'Неизвестный Автор']); ?>
+                            <?= include_template('partials/post/types/quote.php', ['text' => $post['body'], 'author' => 'Неизвестный Автор']) ?>
                         <?php elseif ($post['type'] === 'text') : ?>
-                            <?= include_template('partials/post/types/text.php',  ['text' => $post['body']]); ?>
+                            <?= include_template('partials/post/types/text.php',  ['text' => $post['body']]) ?>
                         <?php elseif ($post['type'] === 'photo') : ?>
-                            <?= include_template('partials/post/types/photo.php', ['img_url' => $post['body']]); ?>
+                            <?= include_template('partials/post/types/photo.php', ['img_url' => $post['body']]) ?>
                         <?php elseif ($post['type'] === 'link') : ?>
-                            <?= include_template('partials/post/types/link.php', ['url' => $post['body'], 'title' => $post['title']]); ?>
+                            §
                         <?php elseif ($post['type'] === 'video') : ?>
-                            <?= include_template('partials/post/types/video.php', ['youtube_url' => $post['body']]); ?>
+                            <?= include_template('partials/post/types/video.php', ['youtube_url' => $post['body']]) ?>
                         <?php endif; ?>
                     <?php endif; ?>
                     <div class="post__indicators">
