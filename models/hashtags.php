@@ -8,9 +8,9 @@ function get_hashtags_by_id($con, $id): ?array
             name
         FROM
             hashtags
-            INNER JOIN posts_has_hashtags  ON hashtags.id = posts_has_hashtags.hashtags_id
+            INNER JOIN posts_has_hashtags  ON hashtags.id = posts_has_hashtags.hashtag_id
         WHERE
-            posts_has_hashtags.posts_id = ?;
+            posts_has_hashtags.post_id = ?;
 ";
 
     $stmt = db_get_prepare_stmt($con, $sql, [$id]);

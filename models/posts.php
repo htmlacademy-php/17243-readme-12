@@ -5,18 +5,18 @@ function get_posts($con): ?array
         SELECT
             p.id,
             p.original_post_id,
-            p.users_id,
+            p.user_id,
             p.title,
             p.body,
             p.views_count,
-            (SELECT COUNT(`id`) FROM comments c WHERE c.posts_id = p.id) as comments_count,
-            (SELECT COUNT(`id`) FROM likes l WHERE l.posts_id = p.id) as likes_count,
+            (SELECT COUNT(`id`) FROM comments c WHERE c.post_id = p.id) as comments_count,
+            (SELECT COUNT(`id`) FROM likes l WHERE l.post_id = p.id) as likes_count,
             c1.classname AS type
         FROM
             posts AS p
-            LEFT JOIN content_types AS c1 ON p.content_types_id = c1.id
-            LEFT JOIN comments AS c2 ON p.id = c2.posts_id
-            LEFT JOIN likes AS l ON p.id = l.posts_id
+            LEFT JOIN content_types AS c1 ON p.content_type_id = c1.id
+            LEFT JOIN comments AS c2 ON p.id = c2.post_id
+            LEFT JOIN likes AS l ON p.id = l.post_id
         GROUP BY p.id;
     ';
 
@@ -33,7 +33,7 @@ function get_posts($con): ?array
 
 function get_posts_by_id($con, ?int $id): ?array
 {
-    $subquery = is_null($id) ? "p.content_types_id = c.id" : "p.id = $id";
+    $subquery = is_null($id) ? "p.content_type_id = c.id" : "p.id = $id";
 
     $sql = "
         SELECT
@@ -45,8 +45,8 @@ function get_posts_by_id($con, ?int $id): ?array
             u.avatar_path AS userpic
         FROM
             posts AS p
-            INNER JOIN users AS u ON p.users_id = u.id
-            INNER JOIN content_types AS c ON c.id = p.content_types_id
+            INNER JOIN users AS u ON p.user_id = u.id
+            INNER JOIN content_types AS c ON c.id = p.content_type_id
         WHERE $subquery
         ORDER BY
             views_count DESC

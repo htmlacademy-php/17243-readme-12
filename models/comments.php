@@ -11,9 +11,9 @@ function get_post_comments_by_id($con, int $id): ?array
         c2.avatar_path AS userpic
     FROM
         comments AS c1
-        INNER JOIN posts AS p ON p.id = c1.posts_id
+        INNER JOIN posts AS p ON p.id = c1.post_id
         AND p.id = ?
-        INNER JOIN users AS c2 ON c2.id = c1.users_id;
+        INNER JOIN users AS c2 ON c2.id = c1.user_id;
 ";
 
     $stmt = db_get_prepare_stmt($con, $sql, [$id]);

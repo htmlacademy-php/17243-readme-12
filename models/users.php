@@ -14,7 +14,7 @@ function get_user_details_by_id($con, $id): ?array
                 FROM
                     subscriptions s
                 WHERE
-                    s.users_id = u.id
+                    s.user_id = u.id
             ) AS subscribers_count,
             (
                 SELECT
@@ -22,11 +22,11 @@ function get_user_details_by_id($con, $id): ?array
                 FROM
                     posts p
                 WHERE
-                    p.users_id = u.id
+                    p.user_id = u.id
             ) AS posts_count
         FROM
             users AS u
-            INNER JOIN posts AS p ON p.users_id = u.id
+            INNER JOIN posts AS p ON p.user_id = u.id
             AND p.id = ?
 ";
 
