@@ -296,6 +296,17 @@ function get_dates_diff($dt_end, $dt_begin = 'now')
 }
 
 /**
+ * @param $array
+ * @param $callback
+ * @return boolean
+ */
+function array_every($array, $callback)
+{
+
+    return  !in_array(false,  array_map($callback, $array));
+}
+
+/**
  * Преобразует экземпляр даты в урезанную версию ассоциативного массива,
  * ключам которого соответствует коллекция слова с требуемым склонением.
  * Склонение определяется числовым значением по ключу,
@@ -345,13 +356,22 @@ function get_human_readable_date($dt = 'now')
 }
 
 /**
+ * @param $string
+ * @return String[]
+ */
+function split_string_into_words($string)
+{
+    return preg_split('/\s+/', html_entity_decode($string));
+}
+
+/**
  * @param $text
  * @param $threshold
  * @return string
  */
 function truncate($text, $threshold = 300)
 {
-    $words = preg_split("/\s/", html_entity_decode($text));
+    $words = split_string_into_words($text);
 
     $result_str = implode(" ", array_reduce($words, function ($acc, $word) use ($threshold) {
         if (strlen(implode(" ", $acc)) < $threshold) {
@@ -362,4 +382,155 @@ function truncate($text, $threshold = 300)
     }, []));
 
     return strlen($result_str) < $threshold ? [$text, false] : [$result_str, true];
+}
+
+/**
+ * @param $haystack
+ * @param $needle
+ * @return boolean
+ */
+function ends_with($haystack, $needle)
+{
+    $length = strlen($needle);
+    return $length > 0 ? substr($haystack, -$length) === $needle : true;
+}
+
+/**
+ * @param $name
+ * @return string
+ */
+function get_post_val($name)
+{
+    return $_POST[$name] ?? "";
+}
+
+/**
+ * @param $hashtag
+ * @param $regex
+ * @return boolean
+ */
+function is_tag_syntax_valid($hashtag)
+{
+    $regex = '/^#[А-Яа-яA-Za-z0_]+$/';
+    $result = preg_match($regex, $hashtag, $matches, PREG_UNMATCHED_AS_NULL);
+
+    return boolval($result);
+}
+
+/**
+ * @param $string
+ * @return string|null
+ */
+function is_url_valid($value)
+{
+    return filter_var($value, FILTER_VALIDATE_URL);
+}
+
+/**
+ * @param $string
+ * @return string|null
+ */
+function validate_length($value, $min, $max)
+{
+    if ($value) {
+        $len = strlen($value);
+        if ($len < $min or $len > $max) {
+            return "Значение должно быть от $min до $max символов";
+        }
+    }
+
+    return null;
+}
+
+/**
+ * @param $string
+ * @return String[]
+ */
+function get_filtered_tags($string)
+{
+    $filtered = array_filter(split_string_into_words($string), 'is_tag_syntax_valid');
+
+    return $filtered;
+}
+
+/**
+ * @param $string
+ * @return string|null
+ */
+function validate_tags($string)
+{
+    $filtered = get_filtered_tags($string);
+
+    if (empty($filtered)) {
+        return 'Тег должен начинаться с&nbsp;символа решетки (#), может содержать только латинские и&nbsp;кириллические символы, а&nbsp;также символ нижнего подчеркивания (_)';
+    }
+
+    return null;
+}
+
+/**
+ * @param $string
+ * @return string|null
+ */
+function validate_link($value)
+{
+    if (!is_url_valid($value)) {
+        return 'Введите корректный URL';
+    } else if (!file_get_contents($value)) {
+        return 'Не удалось загрузить файл';
+    }
+
+    return null;
+}
+
+/**
+ * @param $string
+ * @return string|null
+ */
+function validate_video($value)
+{
+    if (!is_url_valid($value)) {
+        return 'Введите корректный URL';
+    } else if (check_youtube_url($value)) {
+        return null;
+    }
+}
+
+/**
+ * @param $string
+ * @return string|null
+ */
+function validate_upload($value)
+{
+    if (!empty($value['name'])) {
+        $tmp_name = $value['tmp_name'];
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $file_type = finfo_file($finfo, $tmp_name);
+        if (!($file_type === "image/gif" or $file_type === "image/png" or $file_type === "image/jpeg")) {
+            return 'Загрузите картинку в&nbsp;одном из&nbsp;следующих форматов: GIF, PNG, JPEG';
+        }
+
+        return null;
+    }
+
+    return 'Вы не&nbsp;загрузили файл';
+}
+
+/**
+ * @param $data
+ * @param $form_field_link_name
+ * @param $form_field_upload_name
+ * @return string
+ */
+function get_picture_field_name_to_remove($data, $form_field_link_name, $form_field_upload_name)
+{
+    $upload = $data[$form_field_upload_name]['name'];
+    $link = $data[$form_field_link_name];
+
+    if ((empty($link) and empty($upload)) or (!empty($link) and empty($upload))) {
+        return $form_field_upload_name;
+    } else if (empty($link) and !empty($upload)) {
+        return $form_field_link_name;
+    }
 }
