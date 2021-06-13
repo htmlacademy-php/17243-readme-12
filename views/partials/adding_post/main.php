@@ -14,9 +14,9 @@
                                     filters__button
                                     <?= $content_type['classname'] ? 'filters__button--' . esc($content_type['classname']) : '' ?>
                                     tabs__item
-                                    <?= $key === 0 ? 'tabs__item--active filters__button--active' : '' ?>
+                                    <?= (isset($active_category_id) and $active_category_id == $content_type['id']) ? 'tabs__item--active filters__button--active' : '' ?>
                                     button
-                                    " href="#">
+                                    " href="#" onclick="window.location='<?= '/add.php?id=' . ($key + 1) ?>'">
                                     <?php if ($content_type['classname']) : ?>
                                         <svg class="filters__icon" width="24" height="100%">
                                             <use xlink:href="#icon-filter<?= "-" . esc($content_type['classname']) ?>"></use>
@@ -33,24 +33,24 @@
                         <section class="
                             <?= ($content_type['classname'] ? 'adding-post__' . esc($content_type['classname']) : '') ?>
                             tabs__content
-                            <?= $key === 0 ? 'tabs__content--active' : '' ?>
+                            <?= (isset($active_category_id) and $active_category_id == $content_type['id']) ? 'tabs__content--active' : '' ?>
                             ">
                             <?php if (isset($content_type['id'])) : ?>
                                 <?php if ($content_type['id'] == 1) : ?>
                                     <h2 class="visually-hidden">Форма добавления цитаты</h2>
-                                    <?= include_template('partials/adding_post/forms/quote.php') ?>
+                                    <?= include_template('partials/adding_post/forms/quote.php', ['errors' => $errors ?? null]) ?>
                                 <?php elseif ($content_type['id'] == 2) : ?>
                                     <h2 class="visually-hidden">Форма добавления текста</h2>
-                                    <?= include_template('partials/adding_post/forms/text.php') ?>
+                                    <?= include_template('partials/adding_post/forms/text.php', ['errors' => $errors ?? null]) ?>
                                 <?php elseif ($content_type['id'] == 3) : ?>
                                     <h2 class="visually-hidden">Форма добавления фото</h2>
-                                    <?= include_template('partials/adding_post/forms/photo.php') ?>
+                                    <?= include_template('partials/adding_post/forms/photo.php', ['errors' => $errors ?? null]) ?>
                                 <?php elseif ($content_type['id'] == 4) : ?>
                                     <h2 class="visually-hidden">Форма добавления ссылки</h2>
-                                    <?= include_template('partials/adding_post/forms/link.php') ?>
+                                    <?= include_template('partials/adding_post/forms/link.php', ['errors' => $errors ?? null]) ?>
                                 <?php elseif ($content_type['id'] == 5) : ?>
                                     <h2 class="visually-hidden">Форма добавления видео</h2>
-                                    <?= include_template('partials/adding_post/forms/video.php') ?>
+                                    <?= include_template('partials/adding_post/forms/video.php', ['errors' => $errors ?? null]) ?>
                                 <?php endif; ?>
                             <?php endif; ?>
                         </section>
