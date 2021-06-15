@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `readme`.`posts` (
   `dt_add` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   `title` TEXT NOT NULL,
   `body` TEXT NULL,
+  `author_name` TEXT,
   `views_count` INT NULL DEFAULT 0,
   `user_id` INT NOT NULL,
   `content_type_id` INT NOT NULL,
