@@ -2,6 +2,9 @@
 require_once('./helpers.php');
 require_once('./config/init.php');
 require_once('./models/content_types.php');
+require_once('./models/posts.php');
+require_once('./models/hashtags.php');
+require_once('./models/posts_has_hashtags.php');
 
 $content_types = get_content_types($con) ?? [];
 $active_category_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
@@ -100,6 +103,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         return $labels[$form_name][$form_field_name];
     };
 
+    function normalize_form_data($form_data)
+    {
+        $normalized_form_data = [];
+
+        foreach ($form_data as $key => $value) {
+            if (ends_with($key, 'heading')) {
+                $normalized_form_data['title'] = $value;
+            } else if (ends_with($key, 'tags') and !empty($value)) {
+                $normalized_form_data['tags'] = get_filtered_tags($value);
+            } else if ($key === 'quote-author') {
+                $normalized_form_data['author_name'] = $value;
+            } else {
+                $normalized_form_data['body'] = $key === 'userpic-file-photo' ? $value['name'] : $value;
+            }
+        }
+
+        return $normalized_form_data;
+    }
+
     $form_name = $_POST['form-name'];
 
     $errors = [
@@ -165,12 +187,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $form_errors = array_filter($errors[$form_name]);
 
+    [$tags_form_field] = array_values(array_filter(array_keys($validations[$form_name]), function ($value) {
+        return ends_with($value, 'tags');
+    }));
+    $tags = get_filtered_tags($form_data[$tags_form_field] ?? '');
+
     if (count($form_errors)) {
         $page_content = include_template('partials/adding_post/main.php', [
             'content_types' => $content_types,
             'errors' => $form_errors,
             'active_category_id' => $active_category_id,
         ]);
+    } else {
+        if ($form_name === 'photo') {
+            move_uploaded_file($_FILES['userpic-file-photo']['tmp_name'], 'uploads/' . $_FILES['userpic-file-photo']['name']);
+        }
+
+        $normalized_form_data = normalize_form_data($form_data);
+
+        $required_data = array_filter(normalize_form_data($form_data), function ($key) {
+            return $key !== 'tags';
+        }, ARRAY_FILTER_USE_KEY);
+
+        $tags_data = isset($normalized_form_data['tags']) ? $normalized_form_data['tags'] : [];
+
+        $post_res = add_post($con, array_merge($required_data, ['content_type_id' => $active_category_id]));
+
+        if ($post_res) {
+            $post_id = mysqli_insert_id($con);
+        }
+
+        if (!empty($tags_data)) {
+            foreach ($tags_data as $tag) {
+                $tag_res = add_hashtag($con, $tag);
+
+                if ($tag_res) {
+                    $tag_id = mysqli_insert_id($con);
+                    link_tag_with_post($con, [$post_id, $tag_id]);
+                }
+            }
+        }
+
+        header("Location: post.php?id=" . $post_id);
     }
 }
 
