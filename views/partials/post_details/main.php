@@ -1,7 +1,7 @@
 <main class="page__main page__main--publication">
     <div class="container">
         <h1 class="page__title page__title--publication">
-            Наконец, обработала фотки!
+            <?= $post['title'] ?>
         </h1>
         <section class="post-details">
             <h2 class="visually-hidden">Публикация</h2>
@@ -9,15 +9,15 @@
                 <div class="post-details__main-block post post--details">
                     <?php if (isset($post['type'])) : ?>
                         <?php if ($post['type'] === 'quote') : ?>
-                            <?= include_template('partials/post/types/quote.php', ['text' => $post['body'], 'author' => 'Неизвестный Автор']) ?>
+                            <?= include_template('partials/post_details/types/quote.php', ['text' => $post['body'], 'author' => 'Неизвестный Автор']) ?>
                         <?php elseif ($post['type'] === 'text') : ?>
-                            <?= include_template('partials/post/types/text.php',  ['text' => $post['body']]) ?>
+                            <?= include_template('partials/post_details/types/text.php',  ['text' => $post['body']]) ?>
                         <?php elseif ($post['type'] === 'photo') : ?>
-                            <?= include_template('partials/post/types/photo.php', ['img_url' => $post['body']]) ?>
+                            <?= include_template('partials/post_details/types/photo.php', ['img_url' => $post['body']]) ?>
                         <?php elseif ($post['type'] === 'link') : ?>
-                            §
+                            <?= include_template('partials/post_details/types/link.php', ['url' => $post['body'], 'title' => $post['title']]) ?>
                         <?php elseif ($post['type'] === 'video') : ?>
-                            <?= include_template('partials/post/types/video.php', ['youtube_url' => $post['body']]) ?>
+                            <?= include_template('partials/post_details/types/video.php', ['youtube_url' => $post['body']]) ?>
                         <?php endif; ?>
                     <?php endif; ?>
                     <div class="post__indicators">
