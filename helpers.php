@@ -427,28 +427,6 @@ function get_validation_name_and_parameters($rule)
 }
 
 /**
- * @param string $hashtag
- * @param RegExp $regex
- * @return boolean
- */
-function is_tag_syntax_valid($hashtag)
-{
-    $regex = '/^#[А-Яа-яA-Za-z0_]+$/';
-    $result = preg_match($regex, $hashtag, $matches, PREG_UNMATCHED_AS_NULL);
-
-    return boolval($result);
-}
-
-/**
- * @param string $value
- * @return string|null
- */
-function is_url_valid($value)
-{
-    return filter_var($value, FILTER_VALIDATE_URL);
-}
-
-/**
  * @param array $input_array
  * @param string $parameter_name
  * @param string $form_field_label
@@ -507,6 +485,19 @@ function validate_max($input_array, $parameter_name, $form_field_label, $count)
 }
 
 /**
+ * @param string $hashtag
+ * @param RegExp $regex
+ * @return boolean
+ */
+function is_tag_syntax_valid($hashtag)
+{
+    $regex = '/^#[А-Яа-яA-Za-z_]+$/u';
+    $result = preg_match($regex, $hashtag, $matches, PREG_UNMATCHED_AS_NULL);
+
+    return boolval($result);
+}
+
+/**
  * @param string $string
  * @return array
  */
@@ -535,6 +526,15 @@ function validate_tags($input_array, $parameter_name, $form_field_label)
     }
 
     return null;
+}
+
+/**
+ * @param string $value
+ * @return string|null
+ */
+function is_url_valid($value)
+{
+    return filter_var($value, FILTER_VALIDATE_URL);
 }
 
 /**
