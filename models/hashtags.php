@@ -1,7 +1,7 @@
 <?php
 require_once('./helpers.php');
 
-function get_hashtags_by_id($con, $id): ?array
+function get_hashtags_by_id($con, $id)
 {
     $sql = "
         SELECT
@@ -25,4 +25,24 @@ function get_hashtags_by_id($con, $id): ?array
     }
 
     return null;
+}
+
+function add_hashtag($con, $hashtag)
+{
+    $hastag_sql = '
+        INSERT INTO
+            hashtags (name)
+        VALUES
+            (?)
+    ';
+
+    $stmt = db_get_prepare_stmt(
+        $con,
+        $hastag_sql,
+        [$hashtag],
+    );
+
+    $res = mysqli_stmt_execute($stmt);
+
+    return $res;
 }

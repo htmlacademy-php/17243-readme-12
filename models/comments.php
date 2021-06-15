@@ -1,7 +1,7 @@
 <?php
 require_once('./helpers.php');
 
-function get_post_comments_by_id($con, int $id): ?array
+function get_post_comments_by_id($con, $id)
 {
     $sql = "
     SELECT

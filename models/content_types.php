@@ -1,5 +1,5 @@
 <?php
-function get_content_types($con): ?array
+function get_content_types($con)
 {
     $sql = 'SELECT * FROM content_types';
 

@@ -1,5 +1,5 @@
 <?php
-function get_posts($con): ?array
+function get_posts($con)
 {
     $sql = '
         SELECT
@@ -31,7 +31,7 @@ function get_posts($con): ?array
     return null;
 }
 
-function get_posts_by_id($con, ?int $id): ?array
+function get_posts_by_id($con, $id)
 {
     $subquery = is_null($id) ? "p.content_type_id = c.id" : "p.id = $id";
 
@@ -68,4 +68,32 @@ function get_posts_by_id($con, ?int $id): ?array
     }
 
     return null;
+}
+
+function add_post($con, $form_data)
+{
+    $post_sql = '
+        INSERT INTO
+            posts (
+                dt_add,
+                user_id,
+                views_count,
+                title,
+                body,
+                content_type_id,
+                author_name
+            )
+        VALUES
+            (NOW(), 1, 0, ?, ?, ?, ?)
+    ';
+
+    $stmt = db_get_prepare_stmt(
+        $con,
+        $post_sql,
+        [$form_data['title'], $form_data['body'], $form_data['content_type_id'], $form_data['author_name'] ?? null],
+    );
+
+    $res = mysqli_stmt_execute($stmt);
+
+    return $res;
 }
