@@ -13,7 +13,7 @@ require_once('./config/date_timezone_and_locale.php');
  *
  * @param string $date Дата в виде строки
  *
- * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
+ * @return boolean true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
  */
 function is_date_valid(string $date): bool
 {
@@ -26,8 +26,8 @@ function is_date_valid(string $date): bool
 /**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
  *
- * @param $link mysqli Ресурс соединения
- * @param $sql string SQL запрос с плейсхолдерами вместо значений
+ * @param mysqli $link Ресурс соединения
+ * @param string $sql SQL запрос с плейсхолдерами вместо значений
  * @param array $data Данные для вставки на место плейсхолдеров
  *
  * @return mysqli_stmt Подготовленное выражение
@@ -152,11 +152,11 @@ function include_template($name, array $data = [])
 
 /**
  * Функция проверяет доступно ли видео по ссылке на youtube
- * @param string $url ссылка на видео
+ * @param string $url
  *
- * @return string Ошибку если валидация не прошла
+ * @return string|null
  */
-function check_youtube_url($url)
+function check_youtube_url($url, $label)
 {
     $id = extract_youtube_id($url);
 
@@ -166,16 +166,16 @@ function check_youtube_url($url)
     restore_error_handler();
 
     if (!is_array($headers)) {
-        return "Видео по такой ссылке не найдено. Проверьте ссылку на видео";
+        return "$label: Видео по такой ссылке не найдено. Проверьте ссылку на видео";
     }
 
     $err_flag = strpos($headers[0], '200') ? 200 : 404;
 
     if ($err_flag !== 200) {
-        return "Видео по такой ссылке не найдено. Проверьте ссылку на видео";
+        return "$label: Видео по такой ссылке не найдено. Проверьте ссылку на видео";
     }
 
-    return true;
+    return null;
 }
 
 /**
@@ -240,7 +240,7 @@ function extract_youtube_id($youtube_url)
 }
 
 /**
- * @param $index
+ * @param int $index
  * @return false|string
  */
 function generate_random_date($index)
@@ -266,19 +266,8 @@ function generate_random_date($index)
     return $dt;
 }
 
-
 /**
- * @param $args
- * @return void
- */
-function dd(...$args)
-{
-    var_dump(...$args);
-    die();
-}
-
-/**
- * @param $str
+ * @param string $str
  * @return string
  */
 function esc($str)
@@ -287,7 +276,7 @@ function esc($str)
 }
 
 /**
- * @param $dt
+ * @param object $dt
  * @return object
  */
 function get_dates_diff($dt_end, $dt_begin = 'now')
@@ -296,22 +285,11 @@ function get_dates_diff($dt_end, $dt_begin = 'now')
 }
 
 /**
- * @param $array
- * @param $callback
- * @return boolean
- */
-function array_every($array, $callback)
-{
-
-    return  !in_array(false,  array_map($callback, $array));
-}
-
-/**
  * Преобразует экземпляр даты в урезанную версию ассоциативного массива,
  * ключам которого соответствует коллекция слова с требуемым склонением.
  * Склонение определяется числовым значением по ключу,
  * которое передается вспомогательной функции.
- * @param $dt
+ * @param object $dt
  * @return string
  */
 function get_human_readable_date($dt = 'now')
@@ -356,8 +334,8 @@ function get_human_readable_date($dt = 'now')
 }
 
 /**
- * @param $string
- * @return String[]
+ * @param string $string
+ * @return array
  */
 function split_string_into_words($string)
 {
@@ -365,8 +343,8 @@ function split_string_into_words($string)
 }
 
 /**
- * @param $text
- * @param $threshold
+ * @param string $text
+ * @param int $threshold
  * @return string
  */
 function truncate($text, $threshold = 300)
@@ -385,8 +363,8 @@ function truncate($text, $threshold = 300)
 }
 
 /**
- * @param $haystack
- * @param $needle
+ * @param string $haystack
+ * @param string $needle
  * @return boolean
  */
 function ends_with($haystack, $needle)
@@ -396,7 +374,7 @@ function ends_with($haystack, $needle)
 }
 
 /**
- * @param $name
+ * @param string $name
  * @return string
  */
 function get_post_val($name)
@@ -405,8 +383,52 @@ function get_post_val($name)
 }
 
 /**
- * @param $hashtag
- * @param $regex
+ * @param array $rules
+ * @return array
+ */
+function get_validation_rules($rules)
+{
+    $result = [];
+    foreach ($rules as $fieldName => $rule) {
+        $result[$fieldName] = explode('|', $rule);
+    }
+
+    return $result;
+}
+
+/**
+ * @param string $name
+ * @return string
+ */
+function get_validation_method_name($name)
+{
+    $studlyWords = str_replace('-', '_', $name);
+    return "validate_{$studlyWords}";
+}
+
+/**
+ * @typedef {[string, Array<?string>]} NameParametersTuple
+ */
+
+/**
+ * @param string $rule
+ * @return NameParametersTuple
+ */
+function get_validation_name_and_parameters($rule)
+{
+    $nameParams = explode(':', $rule);
+    $parameters = [];
+    $name = $nameParams[0];
+    if (isset($nameParams[1])) {
+        $parameters = explode(',', $nameParams[1]);
+    }
+
+    return [$name, $parameters];
+}
+
+/**
+ * @param string $hashtag
+ * @param RegExp $regex
  * @return boolean
  */
 function is_tag_syntax_valid($hashtag)
@@ -418,7 +440,7 @@ function is_tag_syntax_valid($hashtag)
 }
 
 /**
- * @param $string
+ * @param string $value
  * @return string|null
  */
 function is_url_valid($value)
@@ -427,24 +449,66 @@ function is_url_valid($value)
 }
 
 /**
- * @param $string
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
  * @return string|null
  */
-function validate_length($value, $min, $max)
+function validate_required($input_array, $parameter_name, $form_field_label)
 {
-    if ($value) {
-        $len = strlen($value);
-        if ($len < $min or $len > $max) {
-            return "Значение должно быть от $min до $max символов";
-        }
-    }
-
-    return null;
+    return !array_key_exists($parameter_name, $input_array) ? "$form_field_label: Поле является обязательным для заполнения" : null;
 }
 
 /**
- * @param $string
- * @return String[]
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
+ * @return string|null
+ */
+function validate_string($input_array, $parameter_name, $form_field_label)
+{
+    if (!array_key_exists($parameter_name, $input_array)) {
+        return null;
+    }
+
+    return !empty(intval($input_array[$parameter_name])) ? "$form_field_label: Поле должно быть строкой" : null;
+}
+
+/**
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
+ * @param int $count
+ * @return string|null
+ */
+function validate_min($input_array, $parameter_name, $form_field_label, $count)
+{
+    if (!array_key_exists($parameter_name, $input_array)) {
+        return null;
+    }
+
+    return strlen($input_array[$parameter_name]) < $count ? "$form_field_label: Поле должно быть длиной не менее $count символов" : null;
+}
+
+/**
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
+ * @param int $count
+ * @return string|null
+ */
+function validate_max($input_array, $parameter_name, $form_field_label, $count)
+{
+    if (!array_key_exists($parameter_name, $input_array)) {
+        return null;
+    }
+
+    return strlen($input_array[$parameter_name]) > $count ? "$form_field_label: Поле должно быть длиной менее $count символов" : null;
+}
+
+/**
+ * @param string $string
+ * @return array
  */
 function get_filtered_tags($string)
 {
@@ -454,29 +518,39 @@ function get_filtered_tags($string)
 }
 
 /**
- * @param $string
- * @return string|null
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
  */
-function validate_tags($string)
+function validate_tags($input_array, $parameter_name, $form_field_label)
 {
-    $filtered = get_filtered_tags($string);
+    if (!array_key_exists($parameter_name, $input_array)) {
+        return null;
+    }
+
+    $filtered = get_filtered_tags($input_array[$parameter_name]);
 
     if (empty($filtered)) {
-        return 'Тег должен начинаться с&nbsp;символа решетки (#), может содержать только латинские и&nbsp;кириллические символы, а&nbsp;также символ нижнего подчеркивания (_)';
+        return "$form_field_label: Тег должен начинаться с&nbsp;символа решетки (#), может содержать только латинские и&nbsp;кириллические символы, а&nbsp;также символ нижнего подчеркивания (_)";
     }
 
     return null;
 }
 
 /**
- * @param $string
- * @return string|null
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
  */
-function validate_link($value)
+function validate_link($input_array, $parameter_name, $form_field_label)
 {
-    if (!is_url_valid($value)) {
-        return 'Введите корректный URL';
-    } else if (!file_get_contents($value)) {
+    if (!array_key_exists($parameter_name, $input_array)) {
+        return null;
+    }
+
+    if (!is_url_valid($input_array[$parameter_name])) {
+        return "$form_field_label: Введите корректный URL";
+    } else if (!file_get_contents($input_array[$parameter_name])) {
         return 'Не удалось загрузить файл';
     }
 
@@ -484,53 +558,65 @@ function validate_link($value)
 }
 
 /**
- * @param $string
- * @return string|null
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
  */
-function validate_video($value)
+function validate_video($input_array, $parameter_name, $form_field_label)
 {
-    if (!is_url_valid($value)) {
-        return 'Введите корректный URL';
-    } else if (check_youtube_url($value)) {
+    if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
+
+    if (!is_url_valid($input_array[$parameter_name])) {
+        return "$form_field_label: Введите корректный URL";
+    }
+
+    return check_youtube_url($input_array[$parameter_name], $form_field_label);
 }
 
 /**
- * @param $string
- * @return string|null
+ * @param array $input_array
+ * @param string $parameter_name
+ * @param string $form_field_label
  */
-function validate_upload($value)
+function validate_upload($input_array, $parameter_name, $form_field_label)
 {
+    if (!array_key_exists($parameter_name, $input_array)) {
+        return null;
+    }
+
+    $value = $input_array[$parameter_name];
+
     if (!empty($value['name'])) {
         $tmp_name = $value['tmp_name'];
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $file_type = finfo_file($finfo, $tmp_name);
         if (!($file_type === "image/gif" or $file_type === "image/png" or $file_type === "image/jpeg")) {
-            return 'Загрузите картинку в&nbsp;одном из&nbsp;следующих форматов: GIF, PNG, JPEG';
+            return "$form_field_label: Загрузите картинку в&nbsp;одном из&nbsp;следующих форматов: GIF, PNG, JPEG";
         }
 
         return null;
     }
 
-    return 'Вы не&nbsp;загрузили файл';
+    return "$form_field_label: Вы не&nbsp;загрузили файл";
 }
 
 /**
- * @param $data
- * @param $form_field_link_name
- * @param $form_field_upload_name
+ * @param array $form_data
+ * @param string $form_field_link_name
+ * @param string $form_field_upload_name
  * @return string
  */
-function get_picture_field_name_to_remove($data, $form_field_link_name, $form_field_upload_name)
+function get_photo_field_name_to_remove($form_data, $form_field_link_name, $form_field_upload_name)
 {
-    $upload = $data[$form_field_upload_name]['name'];
-    $link = $data[$form_field_link_name];
+    $upload = $form_data[$form_field_upload_name]['name'];
+    $link = $form_data[$form_field_link_name];
 
     if ((empty($link) and empty($upload)) or (!empty($link) and empty($upload))) {
         return $form_field_upload_name;
-    } else if (empty($link) and !empty($upload)) {
+    } else if (empty($link) and !empty($upload) or (!empty($link) and !empty($upload))) {
         return $form_field_link_name;
     }
 }

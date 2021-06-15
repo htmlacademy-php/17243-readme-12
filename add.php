@@ -17,6 +17,89 @@ $page_content = include_template('partials/adding_post/main.php', [
 ]);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    function get_form_data_by_form_name($form_name)
+    {
+        $form_data = [];
+
+        if ($form_name === 'quote') {
+            $form_data = filter_input_array(INPUT_POST, [
+                'quote-heading' => FILTER_DEFAULT,
+                'quote-text' => FILTER_DEFAULT,
+                'quote-author' => FILTER_DEFAULT,
+                'quote-tags' => FILTER_DEFAULT,
+            ], true);
+        } else if ($form_name === 'text') {
+            $form_data = filter_input_array(INPUT_POST, [
+                'text-heading' => FILTER_DEFAULT,
+                'post-text' => FILTER_DEFAULT,
+                'post-tags' => FILTER_DEFAULT,
+            ], true);
+        } else if ($form_name === 'link') {
+            $form_data = filter_input_array(INPUT_POST, [
+                'link-heading' => FILTER_DEFAULT,
+                'post-link' => FILTER_DEFAULT,
+                'link-tags' => FILTER_DEFAULT,
+            ], true);
+        } else if ($form_name === 'video') {
+            $form_data = filter_input_array(INPUT_POST, [
+                'video-heading' => FILTER_DEFAULT,
+                'video-url' => FILTER_DEFAULT,
+                'video-tags' => FILTER_DEFAULT,
+            ], true);
+        } else if ($form_name === 'photo') {
+            $form_data = array_merge(
+                ['userpic-file-photo' => $_FILES['userpic-file-photo']],
+                filter_input_array(INPUT_POST, [
+                    'photo-heading' => FILTER_DEFAULT,
+                    'photo-url' => FILTER_DEFAULT,
+                    'photo-tags' => FILTER_DEFAULT,
+                ], true)
+            );
+
+            $photo_field_name_to_remove = get_photo_field_name_to_remove($form_data, 'photo-url', 'userpic-file-photo');
+            $form_data = array_filter($form_data, function ($key) use ($photo_field_name_to_remove) {
+                return $key !== $photo_field_name_to_remove;
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
+        return array_filter($form_data);
+    };
+
+    function get_form_field_label($form_name, $form_field_name)
+    {
+        $labels = [
+            'quote' => [
+                'quote-heading' => 'Заголовок',
+                'quote-text' => 'Текст цитаты',
+                'quote-author' => 'Автор',
+                'quote-tags' => 'Теги',
+            ],
+            'text' => [
+                'text-heading' => 'Заголовок',
+                'post-text' => 'Текст поста',
+                'post-tags' => 'Теги',
+            ],
+            'link' => [
+                'link-heading' => 'Заголовок',
+                'post-link' => 'Ссылка',
+                'link-tags' => 'Теги',
+            ],
+            'video' => [
+                'video-heading' => 'Заголовок',
+                'video-url' => 'Ссылка youtube',
+                'video-tags' => 'Теги',
+            ],
+            'photo' => [
+                'photo-heading' => 'Заголовок',
+                'photo-url' => 'Ссылка из интернета',
+                'photo-tags' => 'Теги',
+                'userpic-file-photo' => 'Фото',
+            ],
+        ];
+
+        return $labels[$form_name][$form_field_name];
+    };
+
     $form_name = $_POST['form-name'];
 
     $errors = [
@@ -27,170 +110,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'photo' => [],
     ];
 
-    $form_fields = [
+    $validations = [
         'quote' => [
-            ['name' => 'quote-heading', 'label' => 'Заголовок', 'is_required' => true],
-            ['name' => 'quote-text', 'label' => 'Текст цитаты', 'is_required' => true],
-            ['name' => 'quote-author', 'label' => 'Автор', 'is_required' => true],
-            ['name' => 'quote-tags', 'label' => 'Теги', 'is_required' => false],
+            'quote-heading' => 'required|string|min:10|max:200',
+            'quote-text' => 'required|string|min:10|max:3000',
+            'quote-author' => 'required|string|min:3|max:20',
+            'quote-tags' => 'string|tags',
         ],
         'text' => [
-            ['name' => 'text-heading', 'label' => 'Заголовок', 'is_required' => true],
-            ['name' => 'post-text', 'label' => 'Текст поста', 'is_required' => true],
-            ['name' => 'post-tags', 'label' => 'Теги', 'is_required' => false],
+            'text-heading' => 'required|string|min:10|max:200',
+            'post-text' => 'required|string|min:10|max:3000',
+            'post-tags' => 'string|tags',
         ],
         'link' => [
-            ['name' => 'link-heading', 'label' => 'Заголовок', 'is_required' => true],
-            ['name' => 'post-link', 'label' => 'Ссылка', 'is_required' => true],
-            ['name' => 'link-tags', 'label' => 'Теги', 'is_required' => false],
+            'link-heading' => 'required|string|min:10|max:200',
+            'post-link' => 'required|link',
+            'link-tags' => 'string|tags',
         ],
         'video' => [
-            ['name' => 'video-heading', 'label' => 'Заголовок', 'is_required' => true],
-            ['name' => 'video-url', 'label' => 'Ссылка youtube', 'is_required' => true],
-            ['name' => 'video-tags', 'label' => 'Теги', 'is_required' => false],
+            'video-heading' => 'required|string|min:10|max:200',
+            'video-url' => 'required|video',
+            'video-tags' => 'string|tags',
         ],
         'photo' => [
-            ['name' => 'photo-heading', 'label' => 'Заголовок', 'is_required' => true],
-            ['name' => 'photo-url', 'label' => 'Ссылка из интернета', 'is_required' => true],
-            ['name' => 'photo-tags', 'label' => 'Теги', 'is_required' => false],
-            ['name' => 'userpic-file-photo', 'label' => 'Фото', 'is_required' => true],
+            'photo-heading' => 'required|string|min:10|max:200',
+            'photo-url' => 'link',
+            'userpic-file-photo' => 'upload',
+            'photo-tags' => 'string|tags',
         ],
     ];
 
-    $rules = [
-        'quote' => [
-            'quote-heading' => function ($value) {
-                return validate_length($value, 10, 200);
-            },
-            'quote-text' => function ($value) {
-                return validate_length($value, 10, 3000);
-            },
-            'quote-author' => function ($value) {
-                return validate_length($value, 3, 20);
-            },
-            'quote-tags' => function ($value) {
-                return validate_tags($value);
+    $form_data = get_form_data_by_form_name($form_name);
+
+    $form_validations = get_validation_rules($validations[$form_name]);
+
+    foreach ($form_validations as $field => $rules) {
+        foreach ($rules as $rule) {
+            [$name, $parameters] = get_validation_name_and_parameters($rule);
+            $methodName = get_validation_method_name($name);
+            $methodParameters = array_merge([$form_data, $field, get_form_field_label($form_name, $field)], $parameters);
+
+            if (!assert(function_exists($methodName), "Метод $methodName не найден")) {
+                echo "Функция $methodName не найдена";
+                die();
             }
-        ],
-        'text' => [
-            'text-heading' => function ($value) {
-                return validate_length($value, 10, 200);
-            },
-            'post-text' => function ($value) {
-                return validate_length($value, 10, 3000);
-            },
-            'post-tags' => function ($value) {
-                return validate_tags($value);
-            },
-        ],
-        'link' => [
-            'link-heading' => function ($value) {
-                return validate_length($value, 10, 200);
-            },
-            'post-link' => function ($value) {
-                return validate_link($value);
-            },
-            'link-tags' => function ($value) {
-                return validate_tags($value);
-            },
-        ],
-        'video' => [
-            'video-heading' => function ($value) {
-                return validate_length($value, 10, 200);
-            },
-            'video-url' => function ($value) {
-                return validate_video($value);
-            },
-            'video-tags' => function ($value) {
-                return validate_tags($value);
-            },
-        ],
-        'photo' => [
-            'photo-heading' => function ($value) {
-                return validate_length($value, 10, 200);
-            },
-            'photo-url' => function ($value) {
-                return  validate_link($value);
-            },
-            'photo-tags' => function ($value) {
-                return validate_tags($value);
-            },
-            'userpic-file-photo' => function ($value) {
-                return validate_upload($value);
-            },
-        ],
-    ];
 
-    $form_data = [];
+            $validationResult = call_user_func_array($methodName, $methodParameters);
 
-    if ($form_name === 'quote') {
-        $form_data = filter_input_array(INPUT_POST, [
-            'quote-heading' => FILTER_DEFAULT,
-            'quote-text' => FILTER_DEFAULT,
-            'quote-author' => FILTER_DEFAULT,
-            'quote-tags' => FILTER_DEFAULT,
-        ], true);
-    } else if ($form_name === 'text') {
-        $form_data = filter_input_array(INPUT_POST, [
-            'text-heading' => FILTER_DEFAULT,
-            'post-text' => FILTER_DEFAULT,
-            'post-tags' => FILTER_DEFAULT,
-        ], true);
-    } else if ($form_name === 'link') {
-        $form_data = filter_input_array(INPUT_POST, [
-            'link-heading' => FILTER_DEFAULT,
-            'post-link' => FILTER_DEFAULT,
-            'link-tags' => FILTER_DEFAULT,
-        ], true);
-    } else if ($form_name === 'video') {
-        $form_data = filter_input_array(INPUT_POST, [
-            'video-heading' => FILTER_DEFAULT,
-            'video-url' => FILTER_DEFAULT,
-            'video-tags' => FILTER_DEFAULT,
-        ], true);
-    } else if ($form_name === 'photo') {
-        $form_data = array_merge(
-            ['userpic-file-photo' => $_FILES['userpic-file-photo']],
-            filter_input_array(INPUT_POST, [
-                'photo-heading' => FILTER_DEFAULT,
-                'photo-url' => FILTER_DEFAULT,
-                'photo-tags' => FILTER_DEFAULT,
-            ], true)
-        );
-
-        $picture_field_name_to_remove = get_picture_field_name_to_remove($form_data, 'photo-url', 'userpic-file-photo');
-        $form_data = array_filter($form_data, function ($key) use ($picture_field_name_to_remove) {
-            return $key !== $picture_field_name_to_remove;
-        }, ARRAY_FILTER_USE_KEY);
-    }
-
-    foreach ($form_data as $key => $value) {
-        [$form_field] = array_values(array_filter($form_fields[$form_name], function ($row) use ($key) {
-            return $row['name'] === $key;
-        }));
-
-
-        if (isset($form_field['is_required'])) {
-            if ($form_field['is_required'] and empty($value)) {
-                $errors[$form_name][$key] = $form_field['label'] . '. ' . 'Поле надо заполнить';
-            } else if (($form_field['is_required'] and !empty($value)) or (!$form_field['is_required'] and !empty($value))) {
-                if (isset($rules[$form_name][$key])) {
-                    $rule = $rules[$form_name][$key];
-
-                    if ($rule($value)) {
-                        $errors[$form_name][$key] = $form_field['label'] . '. ' . $rule($value);
-                    }
-                }
+            if ($validationResult !== null) {
+                $errors[$form_name][$field] = $validationResult;
             }
         }
     }
 
-    $errors = array_filter($errors);
+    $form_errors = array_filter($errors[$form_name]);
 
-    if (count($errors[$form_name])) {
+    if (count($form_errors)) {
         $page_content = include_template('partials/adding_post/main.php', [
             'content_types' => $content_types,
-            'errors' => $errors,
+            'errors' => $form_errors,
             'active_category_id' => $active_category_id,
         ]);
     }

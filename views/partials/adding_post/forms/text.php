@@ -36,18 +36,16 @@
             </div>
             <input type="hidden" name="form-name" value="text" />
         </div>
-        <?php if (isset($errors)) :  ?>
-            <?php if (isset($errors['text']) and !empty($errors['text'])) :  ?>
-                <div class="form__invalid-block">
-                    <b class="form__invalid-slogan">Пожалуйста, исправьте следующие ошибки:</b>
-                    <ul class="form__invalid-list">
+        <?php if (isset($errors) and !empty($errors)) :  ?>
+            <div class="form__invalid-block">
+                <b class="form__invalid-slogan">Пожалуйста, исправьте следующие ошибки:</b>
+                <ul class="form__invalid-list">
 
-                        <?php foreach ($errors['text'] as $key => $value) : ?>
-                            <li class="form__invalid-item"><?= $value ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
+                    <?php foreach ($errors as $key => $value) : ?>
+                        <li class="form__invalid-item"><?= $value ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php endif; ?>
     </div>
     <div class="adding-post__buttons">
