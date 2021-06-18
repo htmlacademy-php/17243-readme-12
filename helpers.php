@@ -26,13 +26,13 @@ function is_date_valid(string $date): bool
 /**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
  *
- * @param mysqli $link Ресурс соединения
+ * @param object $link Ресурс соединения
  * @param string $sql SQL запрос с плейсхолдерами вместо значений
  * @param array $data Данные для вставки на место плейсхолдеров
  *
- * @return mysqli_stmt Подготовленное выражение
+ * @return object Подготовленное выражение
  */
-function db_get_prepare_stmt($link, $sql, $data = [])
+function db_get_prepare_stmt(object $link, string $sql, array $data = []): object
 {
     $stmt = mysqli_prepare($link, $sql);
 
@@ -132,7 +132,7 @@ function get_noun_plural_form(int $number, string $one, string $two, string $man
  * @param array $data Ассоциативный массив с данными для шаблона
  * @return string Итоговый HTML
  */
-function include_template($name, array $data = [])
+function include_template(string $name, array $data = [])
 {
     $name = 'views/' . $name;
     $result = '';
@@ -151,39 +151,11 @@ function include_template($name, array $data = [])
 }
 
 /**
- * Функция проверяет доступно ли видео по ссылке на youtube
- * @param string $url
- *
- * @return string|null
- */
-function check_youtube_url($url, $label)
-{
-    $id = extract_youtube_id($url);
-
-    set_error_handler(function () {
-    }, E_WARNING);
-    $headers = get_headers('https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=' . $id);
-    restore_error_handler();
-
-    if (!is_array($headers)) {
-        return "$label: Видео по такой ссылке не найдено. Проверьте ссылку на видео";
-    }
-
-    $err_flag = strpos($headers[0], '200') ? 200 : 404;
-
-    if ($err_flag !== 200) {
-        return "$label: Видео по такой ссылке не найдено. Проверьте ссылку на видео";
-    }
-
-    return null;
-}
-
-/**
  * Возвращает код iframe для вставки youtube видео на страницу
  * @param string $youtube_url Ссылка на youtube видео
  * @return string
  */
-function embed_youtube_video($youtube_url)
+function embed_youtube_video(string $youtube_url): string
 {
     $res = "";
     $id = extract_youtube_id($youtube_url);
@@ -201,7 +173,7 @@ function embed_youtube_video($youtube_url)
  * @param string $youtube_url Ссылка на youtube видео
  * @return string
  */
-function embed_youtube_cover($youtube_url)
+function embed_youtube_cover(string $youtube_url): string
 {
     $res = "";
     $id = extract_youtube_id($youtube_url);
@@ -219,7 +191,7 @@ function embed_youtube_cover($youtube_url)
  * @param string $youtube_url Ссылка на youtube видео
  * @return array
  */
-function extract_youtube_id($youtube_url)
+function extract_youtube_id(string $youtube_url): array
 {
     $id = false;
 
@@ -240,59 +212,14 @@ function extract_youtube_id($youtube_url)
 }
 
 /**
- * @param int $index
- * @return false|string
- */
-function generate_random_date($index)
-{
-    $deltas = [['minutes' => 59], ['hours' => 23], ['days' => 6], ['weeks' => 4], ['months' => 11]];
-    $dcnt = count($deltas);
-
-    if ($index < 0) {
-        $index = 0;
-    }
-
-    if ($index >= $dcnt) {
-        $index = $dcnt - 1;
-    }
-
-    $delta = $deltas[$index];
-    $timeval = rand(1, current($delta));
-    $timename = key($delta);
-
-    $ts = strtotime("$timeval $timename ago");
-    $dt = date('Y-m-d H:i:s', $ts);
-
-    return $dt;
-}
-
-/**
- * @param string $str
- * @return string
- */
-function esc($str)
-{
-    return strip_tags($str);
-}
-
-/**
- * @param object $dt
- * @return object
- */
-function get_dates_diff($dt_end, $dt_begin = 'now')
-{
-    return date_diff(date_create($dt_end), date_create($dt_begin));
-}
-
-/**
  * Преобразует экземпляр даты в урезанную версию ассоциативного массива,
  * ключам которого соответствует коллекция слова с требуемым склонением.
  * Склонение определяется числовым значением по ключу,
  * которое передается вспомогательной функции.
- * @param object $dt
+ * @param string $dt
  * @return string
  */
-function get_human_readable_date($dt = 'now')
+function get_human_readable_date(string $dt = 'now'): string
 {
     $dt_dict = [
         'i' => ['one' => 'минута', 'two' => 'минуты', 'many' => 'минут'],
@@ -333,21 +260,45 @@ function get_human_readable_date($dt = 'now')
     return '';
 }
 
-/**
- * @param string $string
- * @return array
- */
-function split_string_into_words($string)
+function generate_random_date(int $index): string
+{
+    $deltas = [['minutes' => 59], ['hours' => 23], ['days' => 6], ['weeks' => 4], ['months' => 11]];
+    $dcnt = count($deltas);
+
+    if ($index < 0) {
+        $index = 0;
+    }
+
+    if ($index >= $dcnt) {
+        $index = $dcnt - 1;
+    }
+
+    $delta = $deltas[$index];
+    $timeval = rand(1, current($delta));
+    $timename = key($delta);
+
+    $ts = strtotime("$timeval $timename ago");
+    $dt = date('Y-m-d H:i:s', $ts);
+
+    return $dt;
+}
+
+function esc(string $str): string
+{
+    return strip_tags($str);
+}
+
+function get_dates_diff(string $dt_end, string $dt_begin = 'now'): object
+{
+    return date_diff(date_create($dt_end), date_create($dt_begin));
+}
+
+function split_string_into_words(string $string): array
 {
     return preg_split('/\s+/', html_entity_decode($string));
 }
 
-/**
- * @param string $text
- * @param int $threshold
- * @return string
- */
-function truncate($text, $threshold = 300)
+function truncate(string $text, int $threshold = 300): array
 {
     $words = split_string_into_words($text);
 
@@ -362,261 +313,21 @@ function truncate($text, $threshold = 300)
     return strlen($result_str) < $threshold ? [$text, false] : [$result_str, true];
 }
 
-/**
- * @param string $haystack
- * @param string $needle
- * @return boolean
- */
-function ends_with($haystack, $needle)
+function ends_with(string $haystack, string $needle): bool
 {
     $length = strlen($needle);
     return $length > 0 ? substr($haystack, -$length) === $needle : true;
 }
 
-/**
- * @param string $name
- * @return string
- */
-function get_post_val($name)
+function get_post_val(string $name): string
 {
     return $_POST[$name] ?? "";
 }
 
-/**
- * @param array $rules
- * @return array
- */
-function get_validation_rules($rules)
+function remove_empty_form_values(array $values, array $files): array
 {
-    $result = [];
-    foreach ($rules as $fieldName => $rule) {
-        $result[$fieldName] = explode('|', $rule);
-    }
+    $filtered_values = array_filter($values);
+    $filtered_files = empty($files[current(array_keys($files))]['name']) ? [] : $files;
 
-    return $result;
-}
-
-/**
- * @param string $name
- * @return string
- */
-function get_validation_method_name($name)
-{
-    $studlyWords = str_replace('-', '_', $name);
-    return "validate_{$studlyWords}";
-}
-
-/**
- * @typedef {[string, Array<?string>]} NameParametersTuple
- */
-
-/**
- * @param string $rule
- * @return NameParametersTuple
- */
-function get_validation_name_and_parameters($rule)
-{
-    $nameParams = explode(':', $rule);
-    $parameters = [];
-    $name = $nameParams[0];
-    if (isset($nameParams[1])) {
-        $parameters = explode(',', $nameParams[1]);
-    }
-
-    return [$name, $parameters];
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- * @return string|null
- */
-function validate_required($input_array, $parameter_name, $form_field_label)
-{
-    return !array_key_exists($parameter_name, $input_array) ? "$form_field_label: Поле является обязательным для заполнения" : null;
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- * @return string|null
- */
-function validate_string($input_array, $parameter_name, $form_field_label)
-{
-    if (!array_key_exists($parameter_name, $input_array)) {
-        return null;
-    }
-
-    return !empty(intval($input_array[$parameter_name])) ? "$form_field_label: Поле должно быть строкой" : null;
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- * @param int $count
- * @return string|null
- */
-function validate_min($input_array, $parameter_name, $form_field_label, $count)
-{
-    if (!array_key_exists($parameter_name, $input_array)) {
-        return null;
-    }
-
-    return strlen($input_array[$parameter_name]) < $count ? "$form_field_label: Поле должно быть длиной не менее $count символов" : null;
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- * @param int $count
- * @return string|null
- */
-function validate_max($input_array, $parameter_name, $form_field_label, $count)
-{
-    if (!array_key_exists($parameter_name, $input_array)) {
-        return null;
-    }
-
-    return strlen($input_array[$parameter_name]) > $count ? "$form_field_label: Поле должно быть длиной менее $count символов" : null;
-}
-
-/**
- * @param string $hashtag
- * @param RegExp $regex
- * @return boolean
- */
-function is_tag_syntax_valid($hashtag)
-{
-    $regex = '/^#[А-Яа-яA-Za-z_]+$/u';
-    $result = preg_match($regex, $hashtag, $matches, PREG_UNMATCHED_AS_NULL);
-
-    return boolval($result);
-}
-
-/**
- * @param string $string
- * @return array
- */
-function get_filtered_tags($string)
-{
-    $filtered = array_filter(split_string_into_words($string), 'is_tag_syntax_valid');
-
-    return $filtered;
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- */
-function validate_tags($input_array, $parameter_name, $form_field_label)
-{
-    if (!array_key_exists($parameter_name, $input_array)) {
-        return null;
-    }
-
-    $filtered = get_filtered_tags($input_array[$parameter_name]);
-
-    if (empty($filtered)) {
-        return "$form_field_label: Тег должен начинаться с&nbsp;символа решетки (#), может содержать только латинские и&nbsp;кириллические символы, а&nbsp;также символ нижнего подчеркивания (_)";
-    }
-
-    return null;
-}
-
-/**
- * @param string $value
- * @return string|null
- */
-function is_url_valid($value)
-{
-    return filter_var($value, FILTER_VALIDATE_URL);
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- */
-function validate_link($input_array, $parameter_name, $form_field_label)
-{
-    if (!array_key_exists($parameter_name, $input_array)) {
-        return null;
-    }
-
-    if (!is_url_valid($input_array[$parameter_name])) {
-        return "$form_field_label: Введите корректный URL";
-    } else if (!file_get_contents($input_array[$parameter_name])) {
-        return 'Не удалось загрузить файл';
-    }
-
-    return null;
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- */
-function validate_video($input_array, $parameter_name, $form_field_label)
-{
-    if (!array_key_exists($parameter_name, $input_array)) {
-        return null;
-    }
-
-    if (!is_url_valid($input_array[$parameter_name])) {
-        return "$form_field_label: Введите корректный URL";
-    }
-
-    return check_youtube_url($input_array[$parameter_name], $form_field_label);
-}
-
-/**
- * @param array $input_array
- * @param string $parameter_name
- * @param string $form_field_label
- */
-function validate_upload($input_array, $parameter_name, $form_field_label)
-{
-    if (!array_key_exists($parameter_name, $input_array)) {
-        return null;
-    }
-
-    $value = $input_array[$parameter_name];
-
-    if (!empty($value['name'])) {
-        $tmp_name = $value['tmp_name'];
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $file_type = finfo_file($finfo, $tmp_name);
-        if (!($file_type === "image/gif" or $file_type === "image/png" or $file_type === "image/jpeg")) {
-            return "$form_field_label: Загрузите картинку в&nbsp;одном из&nbsp;следующих форматов: GIF, PNG, JPEG";
-        }
-
-        return null;
-    }
-
-    return "$form_field_label: Вы не&nbsp;загрузили файл";
-}
-
-/**
- * @param array $form_data
- * @param string $form_field_link_name
- * @param string $form_field_upload_name
- * @return string
- */
-function get_photo_field_name_to_remove($form_data, $form_field_link_name, $form_field_upload_name)
-{
-    $upload = $form_data[$form_field_upload_name]['name'];
-    $link = $form_data[$form_field_link_name];
-
-    if ((empty($link) and empty($upload)) or (!empty($link) and empty($upload))) {
-        return $form_field_upload_name;
-    } else if (empty($link) and !empty($upload) or (!empty($link) and !empty($upload))) {
-        return $form_field_link_name;
-    }
+    return array_merge($filtered_values, $filtered_files);
 }

@@ -19,7 +19,7 @@ function get_hashtags_by_id($con, $id)
     $result = mysqli_stmt_get_result($stmt);
 
     if ($result) {
-        $hashtags = mysqli_fetch_assoc($result);
+        $hashtags = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         return $hashtags;
     }

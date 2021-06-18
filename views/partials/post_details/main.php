@@ -1,7 +1,7 @@
 <main class="page__main page__main--publication">
     <div class="container">
         <h1 class="page__title page__title--publication">
-            <?= $post['title'] ?>
+            <?= esc($post['title']) ?>
         </h1>
         <section class="post-details">
             <h2 class="visually-hidden">Публикация</h2>
@@ -53,7 +53,7 @@
                     </div>
                     <ul class="post__tags">
                         <?php foreach ($hashtags as $key => $value) : ?>
-                            <li><a href="#"><?= esc($value) ?></a></li>
+                            <li><a href="#"><?= isset($value['name']) ? esc($value['name']) : '' ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                     <div class="comments">
@@ -96,7 +96,7 @@
                                                 </a>
                                                 <time class="post__time" title="<?= date_format(date_create($comment['dt_add']), 'd-m-Y H:i') ?>" datetime="<?= $comment['dt_add'] ?>"><?= get_human_readable_date($comment['dt_add']) . '&nbsp;' . 'назад' ?></time>
                                             </div>
-                                            <p class="comments__text"><?= $comment['text'] ?? '' ?></p>
+                                            <p class="comments__text"><?= esc($comment['text']) ?? '' ?></p>
                                         </div>
                                     </li>
                                 <?php endforeach; ?>
