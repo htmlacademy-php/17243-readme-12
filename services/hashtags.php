@@ -2,10 +2,11 @@
 require_once('./models/hashtags.php');
 require_once('./models/posts_has_hashtags.php');
 
-$validate_tags = function (array $input_array, string $k = 'tags') use ($FORM_FIELDS_VALIDATORS, $FORM_FIELDS_LABELS): array {
+function validate_hashtags(array $input_array, array $validators, array $labels, string $k = 'tags'): array
+{
     $errors = [];
     $form_name = $input_array['form-name'] ?? '';
-    $form_fields_validators = $FORM_FIELDS_VALIDATORS[$form_name] ?? '';
+    $form_fields_validators = $validators[$form_name] ?? '';
 
     $form_validations = get_validation_rules(array_filter($form_fields_validators, function ($key) use ($k) {
         return $key === $k;
@@ -14,7 +15,7 @@ $validate_tags = function (array $input_array, string $k = 'tags') use ($FORM_FI
 
     foreach ($form_validations as $field => $rules) {
         foreach ($rules as $rule) {
-            $label = $FORM_FIELDS_LABELS[$form_name][$field] ?? '';
+            $label = $labels[$form_name][$field] ?? '';
             [$name, $parameters] = get_validation_name_and_parameters($rule);
             $method_name = get_validation_method_name($name);
             $method_parameters = array_merge([$input_array, $field, $label], $parameters, $errors);
@@ -35,7 +36,7 @@ $validate_tags = function (array $input_array, string $k = 'tags') use ($FORM_FI
     return [empty($errors) ? $tags : [], isset($errors[$form_name]) ? $errors[$form_name] : $errors];
 };
 
-function create_tags(object $con, array $tags_data, int $post_id): void
+function create_hashtags(object $con, array $tags_data, int $post_id): void
 {
     if (!empty($tags_data)) {
         foreach ($tags_data as $tag) {

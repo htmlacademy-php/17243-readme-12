@@ -3,9 +3,10 @@ require_once('./helpers.php');
 require_once('./config/init.php');
 require_once('./services/validations.php');
 require_once('./services/post.php');
-require_once('./services/tags.php');
+require_once('./services/hashtags.php');
 require_once('./models/content_types.php');
 require_once('./models/posts.php');
+require_once('./const.php');
 
 $content_types = get_content_types($con) ?? [];
 $active_category_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
@@ -22,13 +23,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $input_data = remove_empty_form_values($_POST, $_FILES);
 
-    [$validated_post_data, $post_errors] = $validate_post($input_data);
-    [$validated_tags_data, $tags_errors] = $validate_tags($input_data);
+    [$validated_post_data, $post_errors] = validate_post(
+        $input_data,
+        $FORM_FIELDS_VALIDATORS,
+        $FORM_FIELDS_LABELS
+    );
+    [$validated_tags_data, $tags_errors] = validate_hashtags(
+        $input_data,
+        $FORM_FIELDS_VALIDATORS,
+        $FORM_FIELDS_LABELS
+    );
     $form_errors = array_merge($post_errors, $tags_errors);
 
     if (empty($form_errors)) {
         $post_id = create_post($con, $validated_post_data, $active_category_id);
-        create_tags($con, $validated_tags_data, $post_id);
+        create_hashtags($con, $validated_tags_data, $post_id);
         header("Location: post.php?id=" . $post_id);
         die();
     }

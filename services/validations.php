@@ -159,7 +159,7 @@ function validate_upload(array $input_array, string $parameter_name, string $for
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $file_type = finfo_file($finfo, $tmp_name);
-        if (!($file_type === "image/gif" or $file_type === "image/png" or $file_type === "image/jpeg")) {
+        if (!($file_type === "image/gif" || $file_type === "image/png" || $file_type === "image/jpeg")) {
             return "$form_field_label: Загрузите картинку в&nbsp;одном из&nbsp;следующих форматов: GIF, PNG, JPEG";
         }
 
@@ -177,12 +177,12 @@ function validate_required_when_matching(array $input_array, string $parameter_n
     $upload = isset($input_array[$form_field_upload_name]) ?? null;
     $link = isset($input_array[$form_field_link_name]) ?? null;
 
-    if (!empty($upload) and !isset($errors[$form_field_upload_name])) {
+    if (!empty($upload) && !isset($errors[$form_field_upload_name])) {
         $error_message = validate_required($input_array, $form_field_upload_name, $form_field_label);
     } else if (
-        (empty($link) and empty($upload) and !isset($errors[$form_field_link_name]))
+        (empty($link) && empty($upload) && !isset($errors[$form_field_link_name]))
         or
-        (!empty($link) and empty($upload) and !isset($errors[$form_field_link_name]))
+        (!empty($link) && empty($upload) && !isset($errors[$form_field_link_name]))
     ) {
         $error_message = validate_required($input_array, $form_field_link_name, $form_field_label);
     }
