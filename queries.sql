@@ -30,7 +30,7 @@ VALUES
 
 /* posts */
 INSERT INTO
-  posts (title, body, users_id, content_types_id)
+  posts (title, body, user_id, content_type_id)
 VALUES
   (
     'Цитата',
@@ -71,7 +71,7 @@ VALUES
 
 /* comments */
 INSERT INTO
-  comments (`text`, `posts_id`, `users_id`)
+  comments (`text`, `post_id`, `user_id`)
 VALUES
   ('Неплохо!', 1, 1),
   ('Кто автор?', 1, 1),
@@ -94,14 +94,14 @@ VALUES
 
 /* likes */
 INSERT INTO
-  likes (posts_id, users_id)
+  likes (post_id, user_id)
 VALUES
   (1, 2),
   (1, 2);
 
 /* subscriptions */
 INSERT INTO
-  subscriptions (subscribers_id, users_id)
+  subscriptions (subscriber_id, user_id)
 VALUES
   (1, 2);
 
@@ -112,13 +112,13 @@ VALUES
 SELECT
   p.dt_add AS post_dt,
   p.title AS post_title,
-  c.name AS content_types,
+  c.name AS content_type,
   u.login AS user_name,
   p.views_count
 FROM
   posts AS p
-  INNER JOIN users AS u ON p.users_id = u.id
-  INNER JOIN content_types AS c ON p.content_types_id = c.id
+  INNER JOIN users AS u ON p.user_id = u.id
+  INNER JOIN content_types AS c ON p.content_type_id = c.id
 ORDER BY
   views_count DESC;
 
@@ -128,7 +128,7 @@ SELECT
   p.title
 FROM
   posts AS p
-  INNER JOIN users AS u ON p.users_id = u.id
+  INNER JOIN users AS u ON p.user_id = u.id
 WHERE
   u.id = 1;
 
@@ -139,7 +139,7 @@ SELECT
   u.login AS username
 FROM
   posts AS p
-  INNER JOIN comments AS c ON c.posts_id = p.id
-  INNER JOIN users AS u ON p.users_id = u.id
+  INNER JOIN comments AS c ON c.post_id = p.id
+  INNER JOIN users AS u ON p.user_id = u.id
 WHERE
   p.id = 2;
