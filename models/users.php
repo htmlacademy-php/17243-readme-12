@@ -1,7 +1,7 @@
 <?php
 require_once('./helpers.php');
 
-function get_user_details_by_id(object $con, int $id): ?array
+function get_user_details_by_id(mysqli $con, int $id): ?array
 {
     $sql = "
         SELECT
@@ -44,7 +44,7 @@ function get_user_details_by_id(object $con, int $id): ?array
     return null;
 }
 
-function get_users_count(object $con, string $field_name)
+function get_users_count(mysqli $con, string $field_name): int
 {
     $email = mysqli_real_escape_string($con, $field_name);
     $sql = "
@@ -60,26 +60,29 @@ function get_users_count(object $con, string $field_name)
     return mysqli_num_rows($res);
 }
 
-function create_user(object $con, $form_data)
+function create_user(mysqli $con, array $form_data): bool
 {
     ['email' => $email, 'login' => $login, 'password' => $password] = array_filter($form_data);
 
-    if (isset($form_data['userpic-file'])) {
+    $is_userpic_exist = isset($form_data['userpic-file']) && $form_data['userpic-file']['name'];
+
+    if ($is_userpic_exist) {
         move_uploaded_file($form_data['userpic-file']['tmp_name'], 'uploads/' . $form_data['userpic-file']['name']);
     }
 
     $password = password_hash($password, PASSWORD_DEFAULT);
-    $sql = '
+    $sql = "
         INSERT INTO
             users (dt_add, email, login, password, avatar_path)
         VALUES
             (NOW(), ?, ?, ?, ?)
-    ';
-    $stmt = db_get_prepare_stmt($con, $sql, [
+    ";
+    $stmt = db_get_prepare_stmt($con, $sql,
+    [
         $email,
         $login,
         $password,
-        isset($form_data['userpic-file']) ? $form_data['userpic-file']['name'] : null,
+        $is_userpic_exist ? $form_data['userpic-file']['name'] : null
     ]);
     $res = mysqli_stmt_execute($stmt);
 

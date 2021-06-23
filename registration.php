@@ -24,17 +24,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $FORM_FIELDS_LABELS
     );
     $form_errors = $errors;
-
     if (empty($form_errors)) {
-        if (get_users_count($con, 'email') > 0) {
+        if (get_users_count($con, $input_data['email']) > 0) {
             $form_errors['email'] = 'Пользователь с этим email уже зарегистрирован';
         } else {
-            $res = create_user($con, [
-                'email' => $validated_data['email'],
-                'login' => $validated_data['login'],
-                'password' => $validated_data['password'],
-                isset($validated_data['userpic-file']) ?? null
-            ]);
+            $res = create_user($con, array_merge(
+                isset($validated_data['userpic-file']) ? ['userpic-file' => $validated_data['userpic-file']] : [],
+                [
+                    'email' => $validated_data['email'],
+                    'login' => $validated_data['login'],
+                    'password' => $validated_data['password']
+                ]
+            ));
         }
 
         if ($res && empty($form_errors)) {

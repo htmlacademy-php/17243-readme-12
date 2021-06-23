@@ -1,7 +1,7 @@
 <?php
 require_once('./helpers.php');
 
-function link_tag_with_post($con, $data)
+function link_tag_with_post(mysqli $con, array $data): bool
 {
     $tag_post_sql = '
         INSERT INTO
@@ -13,7 +13,7 @@ function link_tag_with_post($con, $data)
     $stmt = db_get_prepare_stmt(
         $con,
         $tag_post_sql,
-        $data,
+        $data
     );
 
     $res = mysqli_stmt_execute($stmt);

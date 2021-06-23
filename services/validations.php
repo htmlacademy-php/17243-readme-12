@@ -64,7 +64,7 @@ function validate_max(array $input_array, string $parameter_name, string $form_f
 function is_tag_syntax_valid(string $hashtag): bool
 {
     $regex = '/^#[А-Яа-яA-Za-z_]+$/u';
-    $result = preg_match($regex, $hashtag, $matches, PREG_UNMATCHED_AS_NULL);
+    $result = preg_match($regex, $hashtag, $matches);
 
     return boolval($result);
 }
@@ -169,7 +169,7 @@ function validate_upload(array $input_array, string $parameter_name, string $for
     return "$form_field_label: Вы не&nbsp;загрузили файл";
 }
 
-function validate_required_when_matching(array $input_array, string $parameter_name, string $form_field_label, string $form_field_name, array $errors = [])
+function validate_required_when_matching(array $input_array, string $parameter_name, string $form_field_label, string $form_field_name, array $errors = []): ?string
 {
     $form_field_link_name = $parameter_name === 'body' ? $parameter_name : $form_field_name;
     $form_field_upload_name = $parameter_name === 'file-photo' ? $parameter_name : $form_field_name;
@@ -198,7 +198,7 @@ function validate_login(array $input_array, string $parameter_name, string $form
 
     $value = $input_array[$parameter_name];
     $regex = '/^[a-z0-9_-]+$/';
-    $result = preg_match($regex, $value, $matches, PREG_UNMATCHED_AS_NULL);
+    $result = preg_match($regex, $value, $matches);
 
     return boolval($result) ? null : "$form_field_label: Можно использовать только латинские буквы, цифры, дефис (-) и символ нижнего подчеркивания (_)";
 }
@@ -220,7 +220,7 @@ function validate_password(array $input_array, string $parameter_name, string $f
 
     $value = $input_array[$parameter_name];
     $regex = '/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/';
-    $result = preg_match($regex, $value, $matches, PREG_UNMATCHED_AS_NULL);
+    $result = preg_match($regex, $value, $matches);
 
     return boolval($result) ? null : "$form_field_label: Должен состоять из восьми или более символов (можно использовать только латинские буквы и цифры), минимум одна буква, минимум одна цифра";
 }

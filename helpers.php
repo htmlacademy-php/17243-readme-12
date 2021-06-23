@@ -26,13 +26,13 @@ function is_date_valid(string $date): bool
 /**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
  *
- * @param object $link Ресурс соединения
+ * @param mysqli $link Ресурс соединения
  * @param string $sql SQL запрос с плейсхолдерами вместо значений
  * @param array $data Данные для вставки на место плейсхолдеров
  *
- * @return object Подготовленное выражение
+ * @return mysqli_stmt Подготовленное выражение
  */
-function db_get_prepare_stmt(object $link, string $sql, array $data = []): object
+function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): mysqli_stmt
 {
     $stmt = mysqli_prepare($link, $sql);
 
@@ -132,7 +132,7 @@ function get_noun_plural_form(int $number, string $one, string $two, string $man
  * @param array $data Ассоциативный массив с данными для шаблона
  * @return string Итоговый HTML
  */
-function include_template(string $name, array $data = [])
+function include_template(string $name, array $data = []): ?string
 {
     $name = 'views/' . $name;
     $result = '';
@@ -288,7 +288,7 @@ function esc(string $str): string
     return strip_tags($str);
 }
 
-function get_dates_diff(string $dt_end, string $dt_begin = 'now'): object
+function get_dates_diff(string $dt_end, string $dt_begin = 'now'): DateInterval
 {
     return date_diff(date_create($dt_end), date_create($dt_begin));
 }
