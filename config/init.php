@@ -1,8 +1,12 @@
 <?php
-require_once('./helpers.php');
-$db = require_once('config/db.php');
+session_start();
 
-$con = mysqli_connect($db['host'], $db['user'], $db['password'], $db['database'], $db['port']);
+require_once('./helpers.php');
+$db_cfg = require_once('config/db.php');
+$db_cfg = array_values($db_cfg);
+
+$con = mysqli_connect(...$db_cfg);
+
 if (!$con) {
     echo "Cannot connect to database";
     die();
@@ -10,4 +14,4 @@ if (!$con) {
 
 mysqli_set_charset($con, "utf8");
 
-$is_auth = rand(0, 1);
+/* $is_auth = rand(0, 1); */

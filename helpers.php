@@ -189,9 +189,9 @@ function embed_youtube_cover(string $youtube_url): string
 /**
  * Извлекает из ссылки на youtube видео его уникальный ID
  * @param string $youtube_url Ссылка на youtube видео
- * @return array
+ * @return string|bool
  */
-function extract_youtube_id(string $youtube_url): array
+function extract_youtube_id(string $youtube_url): ?string
 {
     $id = false;
 

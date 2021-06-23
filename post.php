@@ -1,5 +1,6 @@
 <?php
 require_once('./config/init.php');
+require_once('./helpers.php');
 require_once('./models/posts.php');
 require_once('./models/comments.php');
 require_once('./models/hashtags.php');
@@ -28,7 +29,7 @@ $user_details = get_user_details_by_id($con, $id) ?? [];
 
 $head = include_template('partials/head.php', ['title' => 'readme: публикация']);
 $symbols = include_template('partials/symbols.php');
-$page_header = include_template('partials/header.php', ['is_auth' => $is_auth, 'username' => 'Вася Попкин']);
+$page_header = include_template('partials/header.php', ['username' => 'Вася Попкин']);
 $page_content = include_template('partials/post_details/main.php', [
     'post' => array_merge([], ...array_filter($posts, function ($post) use ($id) {
         return $post['id'] === $id;

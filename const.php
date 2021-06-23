@@ -27,6 +27,13 @@ $FORM_FIELDS_VALIDATORS = [
         'tags' => 'string|tags',
         'file-photo' => 'required_when_matching:body|upload',
     ],
+    'registration' => [
+        'login' => 'required|login|min:5|max:25',
+        'email' => 'required|email',
+        'password' => 'required|password',
+        'password-repeat' => 'required|password_matching:password',
+        'userpic-file' => 'upload'
+    ],
 ];
 
 $FORM_FIELDS_LABELS = [
@@ -56,5 +63,12 @@ $FORM_FIELDS_LABELS = [
         'body' => 'Ссылка из интернета',
         'tags' => 'Теги',
         'file-photo' => 'Фото',
+    ],
+    'registration' => [
+        'login' => 'Логин',
+        'email' => 'Email',
+        'password' => 'Пароль',
+        'password-repeat' => 'Повтор пароля',
+        'userpic-file' => 'Фото'
     ],
 ];
