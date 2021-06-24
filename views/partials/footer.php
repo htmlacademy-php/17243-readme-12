@@ -1,4 +1,4 @@
-<footer class="footer">
+<footer class="footer <?= isset($modifier) ? "footer--{$modifier}" : '' ?>">
     <div class="footer__wrapper">
         <div class="footer__container container">
             <div class="footer__site-info">

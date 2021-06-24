@@ -2,11 +2,11 @@
 require_once('./helpers.php');
 require_once('./config/init.php');
 
-$head = include_template('partials/head.php', ['title' => 'readme: блог, каким он должен быть']);
+$head = include_template('partials/head.php', ['title' => 'readme: моя лента']);
 $symbols = include_template('partials/symbols.php');
-$page_header = include_template('partials/auth/header.php');
-$page_content = include_template('partials/auth/main.php');
-$page_footer = include_template('partials/footer.php', ['modifier' => 'main']);
+$page_header = include_template('partials/header.php');
+$page_content = include_template('partials/feed/main.php');
+$page_footer = include_template('partials/footer.php');
 $layout_content = include_template('partials/auth/layout.php', [
     'head' => $head,
     'symbols' => $symbols,
