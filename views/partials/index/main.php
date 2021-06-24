@@ -50,7 +50,7 @@
                             <a class="
                                 filters__button
                                 <?= $content_type['classname'] ? 'filters__button--' . esc($content_type['classname']) : '' ?>
-                                <?= $content_type['id'] === $params['content_type_id'] ? 'filters__button--active' : '' ?>
+                                <?= !is_null($params['content_type_id']) && $content_type['id'] === $params['content_type_id'] ? 'filters__button--active' : '' ?>
                                 button
                                 " href="/index.php?id=<?= $content_type['id'] ?>">
                                 <span class="visually-hidden"><?= esc($content_type['name']) ?? '' ?></span>

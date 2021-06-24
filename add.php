@@ -1,6 +1,6 @@
 <?php
-require_once('./helpers.php');
 require_once('./config/init.php');
+require_once('./helpers.php');
 require_once('./services/validations.php');
 require_once('./services/post.php');
 require_once('./services/hashtags.php');
@@ -13,7 +13,7 @@ $active_category_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 
 $head = include_template('partials/head.php', ['title' => 'readme: добавление публикации']);
 $symbols = include_template('partials/symbols.php');
-$page_header = include_template('partials/header.php', ['is_auth' => $is_auth, 'username' => 'Вася Попкин']);
+$page_header = include_template('partials/header.php', ['username' => 'Вася Попкин']);
 $page_footer = include_template('partials/footer.php');
 $modal = include_template('partials/adding_post/modals/add.php');
 

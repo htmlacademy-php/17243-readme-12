@@ -10,7 +10,7 @@ $posts = get_posts_by_id($con, $id) ?? [];
 
 $head = include_template('partials/head.php', ['title' => 'readme: популярное']);
 $symbols = include_template('partials/symbols.php');
-$page_header = include_template('partials/header.php', ['is_auth' => $is_auth, 'username' => 'Вася Попкин']);
+$page_header = include_template('partials/header.php', ['username' => 'Вася Попкин']);
 $page_content = include_template('partials/index/main.php', ['posts' => $posts, 'content_types' => $content_types, 'params' => ['content_type_id' => $id]]);
 $page_footer = include_template('partials/footer.php');
 $layout_content = include_template('partials/index/layout.php', [
