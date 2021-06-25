@@ -34,6 +34,10 @@ $FORM_FIELDS_VALIDATORS = [
         'password-repeat' => 'required|password_matching:password',
         'userpic-file' => 'upload'
     ],
+    'authorization' => [
+        'login' => 'required',
+        'password' => 'required'
+    ],
 ];
 
 $FORM_FIELDS_LABELS = [
@@ -70,5 +74,5 @@ $FORM_FIELDS_LABELS = [
         'password' => 'Пароль',
         'password-repeat' => 'Повтор пароля',
         'userpic-file' => 'Фото'
-    ],
+    ]
 ];

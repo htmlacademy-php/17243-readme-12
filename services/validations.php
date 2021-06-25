@@ -29,36 +29,44 @@ function get_validation_name_and_parameters(string $rule): array
     return [$name, $parameters];
 }
 
-function validate_required(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_required(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
-    return !array_key_exists($parameter_name, $input_array) ? "$form_field_label: Поле является обязательным для заполнения" : null;
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+    return !array_key_exists($parameter_name, $input_array) ? "{$label}Поле является обязательным для заполнения" : null;
 }
 
-function validate_string(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_string(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
 
-    return !empty(intval($input_array[$parameter_name])) ? "$form_field_label: Поле должно быть строкой" : null;
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+    return !empty(intval($input_array[$parameter_name])) ? "{$label}Поле должно быть строкой" : null;
 }
 
-function validate_min(array $input_array, string $parameter_name, string $form_field_label, int $count): ?string
+function validate_min(array $input_array, string $parameter_name, ?string $form_field_label, int $count): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
 
-    return strlen($input_array[$parameter_name]) < $count ? "$form_field_label: Поле должно быть длиной не менее $count символов" : null;
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+    return strlen($input_array[$parameter_name]) < $count ? "{$label}Поле должно быть длиной не менее $count символов" : null;
 }
 
-function validate_max(array $input_array, string $parameter_name, string $form_field_label, int $count): ?string
+function validate_max(array $input_array, string $parameter_name, ?string $form_field_label, int $count): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
 
-    return strlen($input_array[$parameter_name]) > $count ? "$form_field_label: Поле должно быть длиной менее $count символов" : null;
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+    return strlen($input_array[$parameter_name]) > $count ? "{$label}Поле должно быть длиной менее $count символов" : null;
 }
 
 function is_tag_syntax_valid(string $hashtag): bool
@@ -76,7 +84,7 @@ function get_filtered_tags(string $string): array
     return $filtered;
 }
 
-function validate_tags(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_tags(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
@@ -85,7 +93,9 @@ function validate_tags(array $input_array, string $parameter_name, string $form_
     $filtered = get_filtered_tags($input_array[$parameter_name]);
 
     if (empty($filtered)) {
-        return "$form_field_label: Тег должен начинаться с&nbsp;символа решетки (#), может содержать только латинские и&nbsp;кириллические символы, а&nbsp;также символ нижнего подчеркивания (_)";
+        $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+        return "{$label}}Тег должен начинаться с&nbsp;символа решетки (#), может содержать только латинские и&nbsp;кириллические символы, а&nbsp;также символ нижнего подчеркивания (_)";
     }
 
     return null;
@@ -96,8 +106,10 @@ function is_url_valid(string $value): ?string
     return filter_var($value, FILTER_VALIDATE_URL);
 }
 
-function check_youtube_url(string $url, string $label): ?string
+function check_youtube_url(string $url, ?string $label): ?string
 {
+    $label = isset($label) ? "$label: " : '';
+
     $id = extract_youtube_id($url);
 
     set_error_handler(function () {
@@ -106,26 +118,28 @@ function check_youtube_url(string $url, string $label): ?string
     restore_error_handler();
 
     if (!is_array($headers)) {
-        return "$label: Видео по такой ссылке не найдено. Проверьте ссылку на видео";
+        return "{$label}Видео по такой ссылке не найдено. Проверьте ссылку на видео";
     }
 
     $err_flag = strpos($headers[0], '200') ? 200 : 404;
 
     if ($err_flag !== 200) {
-        return "$label: Видео по такой ссылке не найдено. Проверьте ссылку на видео";
+        return "{$label}Видео по такой ссылке не найдено. Проверьте ссылку на видео";
     }
 
     return null;
 }
 
-function validate_link(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_link(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
 
     if (!is_url_valid($input_array[$parameter_name])) {
-        return "$form_field_label: Введите корректный URL";
+        $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+        return "{$label}Введите корректный URL";
     } else if (!file_get_contents($input_array[$parameter_name])) {
         return 'Не удалось загрузить файл';
     }
@@ -133,26 +147,29 @@ function validate_link(array $input_array, string $parameter_name, string $form_
     return null;
 }
 
-function validate_video(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_video(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
 
     if (!is_url_valid($input_array[$parameter_name])) {
-        return "$form_field_label: Введите корректный URL";
+        $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+        return "{$label}Введите корректный URL";
     }
 
     return check_youtube_url($input_array[$parameter_name], $form_field_label);
 }
 
-function validate_upload(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_upload(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
 
     $value = $input_array[$parameter_name];
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
 
     if (!empty($value['name'])) {
         $tmp_name = $value['tmp_name'];
@@ -160,16 +177,16 @@ function validate_upload(array $input_array, string $parameter_name, string $for
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $file_type = finfo_file($finfo, $tmp_name);
         if (!($file_type === "image/gif" || $file_type === "image/png" || $file_type === "image/jpeg")) {
-            return "$form_field_label: Загрузите картинку в&nbsp;одном из&nbsp;следующих форматов: GIF, PNG, JPEG";
+            return "{$label}Загрузите картинку в&nbsp;одном из&nbsp;следующих форматов: GIF, PNG, JPEG";
         }
 
         return null;
     }
 
-    return "$form_field_label: Вы не&nbsp;загрузили файл";
+    return "{$label}Вы не&nbsp;загрузили файл";
 }
 
-function validate_required_when_matching(array $input_array, string $parameter_name, string $form_field_label, string $form_field_name, array $errors = []): ?string
+function validate_required_when_matching(array $input_array, string $parameter_name, ?string $form_field_label, string $form_field_name, array $errors = []): ?string
 {
     $form_field_link_name = $parameter_name === 'body' ? $parameter_name : $form_field_name;
     $form_field_upload_name = $parameter_name === 'file-photo' ? $parameter_name : $form_field_name;
@@ -190,7 +207,7 @@ function validate_required_when_matching(array $input_array, string $parameter_n
     return $error_message ?? null;
 }
 
-function validate_login(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_login(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
@@ -199,20 +216,23 @@ function validate_login(array $input_array, string $parameter_name, string $form
     $value = $input_array[$parameter_name];
     $regex = '/^[a-z0-9_-]+$/';
     $result = preg_match($regex, $value, $matches);
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
 
-    return boolval($result) ? null : "$form_field_label: Можно использовать только латинские буквы, цифры, дефис (-) и символ нижнего подчеркивания (_)";
+    return boolval($result) ? null : "{$label}Можно использовать только латинские буквы, цифры, дефис (-) и символ нижнего подчеркивания (_)";
 }
 
-function validate_email(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_email(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
     }
 
-    return filter_var($input_array[$parameter_name], FILTER_VALIDATE_EMAIL) ? null : "$form_field_label: Введите корректный email";
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
+
+    return filter_var($input_array[$parameter_name], FILTER_VALIDATE_EMAIL) ? null : "{$label}Введите корректный email";
 }
 
-function validate_password(array $input_array, string $parameter_name, string $form_field_label): ?string
+function validate_password(array $input_array, string $parameter_name, ?string $form_field_label): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
@@ -221,11 +241,12 @@ function validate_password(array $input_array, string $parameter_name, string $f
     $value = $input_array[$parameter_name];
     $regex = '/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/';
     $result = preg_match($regex, $value, $matches);
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
 
-    return boolval($result) ? null : "$form_field_label: Должен состоять из восьми или более символов (можно использовать только латинские буквы и цифры), минимум одна буква, минимум одна цифра";
+    return boolval($result) ? null : "{$label}Должен состоять из восьми или более символов (можно использовать только латинские буквы и цифры), минимум одна буква, минимум одна цифра";
 }
 
-function validate_password_matching(array $input_array, string $parameter_name, string $form_field_label, string $value): ?string
+function validate_password_matching(array $input_array, string $parameter_name, ?string $form_field_label, string $value): ?string
 {
     if (!array_key_exists($parameter_name, $input_array)) {
         return null;
@@ -233,6 +254,7 @@ function validate_password_matching(array $input_array, string $parameter_name, 
 
     $password = $input_array[$parameter_name];
     $password2 = $input_array[$value];
+    $label = isset($form_field_label) ? "$form_field_label: " : '';
 
-    return $password !== $password2 ? "$form_field_label: Пароль и подтверждение пароля не совпадают" : null;
+    return $password !== $password2 ? "{$label}Пароль и подтверждение пароля не совпадают" : null;
 }

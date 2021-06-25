@@ -4,6 +4,11 @@ require_once('./config/init.php');
 require_once('./models/posts.php');
 require_once('./models/content_types.php');
 
+if (!isset($_SESSION['user'])) {
+    header("Location: /index.php");
+    die();
+}
+
 $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 $content_types = get_content_types($con) ?? [];
 $posts = get_posts_by_id($con, $id) ?? [];

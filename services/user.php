@@ -1,7 +1,6 @@
 <?php
 require_once('./const.php');
 require_once('./services/validations.php');
-require_once('./models/users.php');
 
 function validate_user(array $input_array, array $validators, array $labels): array
 {
@@ -12,7 +11,7 @@ function validate_user(array $input_array, array $validators, array $labels): ar
 
     foreach ($form_validations as $field => $rules) {
         foreach ($rules as $rule) {
-            $label = $labels[$form_name][$field] ?? '';
+            $label = $labels[$form_name][$field] ?? null;
             [$name, $parameters] = get_validation_name_and_parameters($rule);
             $method_name = get_validation_method_name($name);
             $method_parameters = array_merge([$input_array, $field, $label], $parameters);
