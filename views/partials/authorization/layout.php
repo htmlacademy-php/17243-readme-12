@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <?= $head ?>
 
-<body class="page">
+<body class="page page--main">
     <?= $symbols ?>
-
     <?= $page_header ?>
-
     <?= $page_content ?>
-
     <?= $page_footer ?>
-    <script src="js/main.js"></script>
-
 </body>
 
 </html>

@@ -12,7 +12,7 @@ function validate_user(array $input_array, array $validators, array $labels): ar
 
     foreach ($form_validations as $field => $rules) {
         foreach ($rules as $rule) {
-            $label = $labels[$form_name][$field] ?? '';
+            $label = $labels[$form_name][$field] ?? null;
             [$name, $parameters] = get_validation_name_and_parameters($rule);
             $method_name = get_validation_method_name($name);
             $method_parameters = array_merge([$input_array, $field, $label], $parameters);
@@ -34,3 +34,19 @@ function validate_user(array $input_array, array $validators, array $labels): ar
         return $value !== $form_name;
     }) : [], $errors];
 };
+
+function validate_user_credentials(mysqli $con, array $input_array): array
+{
+    $errors = [];
+    $user = get_user($con, 'login', $input_array['login']);
+
+    if ($user) {
+        if (!password_verify($input_array['password'], $user['password'])) {
+            $errors['password'] = 'Пароли не совпадают';
+        }
+    } else {
+        $errors['login'] = 'Неверный логин';
+    }
+
+    return [$user, $errors];
+}

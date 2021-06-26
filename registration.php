@@ -2,7 +2,8 @@
 require_once('./helpers.php');
 require_once('./config/init.php');
 require_once('./const.php');
-require_once('./services/registration.php');
+require_once('./services/user.php');
+require_once('./models/users.php');
 
 $head = include_template('partials/head.php', ['title' => 'readme: регистрация']);
 $symbols = include_template('partials/symbols.php');
@@ -25,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     );
     $form_errors = $errors;
     if (empty($form_errors)) {
-        if (get_users_count($con, $input_data['email']) > 0) {
+        if (get_user($con, 'email', $input_data['email'])) {
             $form_errors['email'] = 'Пользователь с этим email уже зарегистрирован';
         } else {
             $res = create_user($con, array_merge(
@@ -46,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 $page_content = include_template('partials/registration/main.php', ['errors' => $form_errors]);
-$layout_content = include_template('partials/registration/layout.php', [
+$layout_content = include_template('partials/layout.php', [
     'head' => $head,
     'symbols' => $symbols,
     'page_header' => $page_header,

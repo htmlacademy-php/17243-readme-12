@@ -44,20 +44,20 @@ function get_user_details_by_id(mysqli $con, int $id): ?array
     return null;
 }
 
-function get_users_count(mysqli $con, string $field_name): int
+function get_user(mysqli $con, string $field_name, string $value): ?array
 {
-    $email = mysqli_real_escape_string($con, $field_name);
+    $esc_value = mysqli_real_escape_string($con, $value);
     $sql = "
     SELECT
-        id
+        *
     FROM
         users
     WHERE
-        email = '$email'
+        $field_name = '$esc_value'
     ";
     $res = mysqli_query($con, $sql);
 
-    return mysqli_num_rows($res);
+    return $res ? mysqli_fetch_array($res, MYSQLI_ASSOC) : null;
 }
 
 function create_user(mysqli $con, array $form_data): bool

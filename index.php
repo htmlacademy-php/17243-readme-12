@@ -1,19 +1,46 @@
 <?php
 require_once('./helpers.php');
 require_once('./config/init.php');
-require_once('./models/posts.php');
-require_once('./models/content_types.php');
+require_once('./const.php');
+require_once('./services/user.php');
 
-$id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-$content_types = get_content_types($con) ?? [];
-$posts = get_posts_by_id($con, $id) ?? [];
-
-$head = include_template('partials/head.php', ['title' => 'readme: популярное']);
+$head = include_template('partials/head.php', ['title' => 'readme: блог, каким он должен быть']);
 $symbols = include_template('partials/symbols.php');
-$page_header = include_template('partials/header.php', ['username' => 'Вася Попкин']);
-$page_content = include_template('partials/index/main.php', ['posts' => $posts, 'content_types' => $content_types, 'params' => ['content_type_id' => $id]]);
-$page_footer = include_template('partials/footer.php');
-$layout_content = include_template('partials/index/layout.php', [
+$page_header = include_template('partials/authorization/header.php');
+$page_footer = include_template('partials/footer.php', ['modifier' => 'main']);
+
+$form_errors = [];
+$user_credentials_errors = [];
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $input_data = remove_empty_form_values($_POST, $_FILES);
+
+    [, $errors] = validate_user(
+        $input_data,
+        $FORM_FIELDS_VALIDATORS,
+        $FORM_FIELDS_LABELS
+    );
+
+    $form_errors = $errors;
+
+    if (!count($form_errors)) {
+        [$user, $user_credentials_errors] = validate_user_credentials($con, $input_data);
+
+        if (!count($user_credentials_errors)) {
+            $_SESSION['user'] = $user;
+            header("Location: /feed.php");
+            die();
+        }
+    }
+}
+
+if (isset($_SESSION['user'])) {
+    header("Location: /feed.php");
+    die();
+}
+
+$page_content = include_template('partials/authorization/main.php', ['errors' => array_merge($form_errors, $user_credentials_errors)]);
+$layout_content = include_template('partials/authorization/layout.php', [
     'head' => $head,
     'symbols' => $symbols,
     'page_header' => $page_header,
