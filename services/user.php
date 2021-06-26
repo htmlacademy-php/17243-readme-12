@@ -1,6 +1,7 @@
 <?php
 require_once('./const.php');
 require_once('./services/validations.php');
+require_once('./models/users.php');
 
 function validate_user(array $input_array, array $validators, array $labels): array
 {
@@ -33,3 +34,19 @@ function validate_user(array $input_array, array $validators, array $labels): ar
         return $value !== $form_name;
     }) : [], $errors];
 };
+
+function validate_user_credentials(mysqli $con, array $input_array): array
+{
+    $errors = [];
+    $user = get_user($con, 'login', $input_array['login']);
+
+    if ($user) {
+        if (!password_verify($input_array['password'], $user['password'])) {
+            $errors['password'] = 'Пароли не совпадают';
+        }
+    } else {
+        $errors['login'] = 'Неверный логин';
+    }
+
+    return [$user, $errors];
+}

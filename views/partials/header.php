@@ -51,7 +51,7 @@
                             </div>
                             <div class="header__profile-name">
                                 <span>
-                                    <?= isset($_SESSION['user']) ? esc($_SESSION['user']['login']) : '' ?>
+                                    <?= isset($_SESSION['user']) ? esc($_SESSION['user']['login']) : 'Неавторизованный пользователь' ?>
                                 </span>
                                 <svg class="header__link-arrow" width="10" height="6">
                                     <use xlink:href="#icon-arrow-right-ad"></use>
