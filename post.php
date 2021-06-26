@@ -39,7 +39,7 @@ $page_content = include_template('partials/post_details/main.php', [
     'user_details' => $user_details,
 ]);
 $page_footer = include_template('partials/footer.php');
-$layout_content = include_template('partials/post_details/layout.php', [
+$layout_content = include_template('partials/layout.php', [
     'head' => $head,
     'symbols' => $symbols,
     'page_header' => $page_header,

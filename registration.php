@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 $page_content = include_template('partials/registration/main.php', ['errors' => $form_errors]);
-$layout_content = include_template('partials/registration/layout.php', [
+$layout_content = include_template('partials/layout.php', [
     'head' => $head,
     'symbols' => $symbols,
     'page_header' => $page_header,
