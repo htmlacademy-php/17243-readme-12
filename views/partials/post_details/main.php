@@ -9,7 +9,7 @@
                 <div class="post-details__main-block post post--details">
                     <?php if (isset($post['type'])) : ?>
                         <?php if ($post['type'] === 'quote') : ?>
-                            <?= include_template('partials/post_details/types/quote.php', ['text' => $post['body'], 'author' => 'Неизвестный Автор']) ?>
+                            <?= include_template('partials/post_details/types/quote.php', ['text' => $post['body'], 'author' => $post['author_name']]) ?>
                         <?php elseif ($post['type'] === 'text') : ?>
                             <?= include_template('partials/post_details/types/text.php',  ['text' => $post['body']]) ?>
                         <?php elseif ($post['type'] === 'photo') : ?>
@@ -53,7 +53,7 @@
                     </div>
                     <ul class="post__tags">
                         <?php foreach ($hashtags as $key => $value) : ?>
-                            <li><a href="#"><?= isset($value['name']) ? esc($value['name']) : '' ?></a></li>
+                            <li><a href="<?= 'search.php' . '?' . (isset($value['name']) ? '&q=' . $value['name'] : '') . '&type=hashtag' ?>"><?= isset($value['name']) ? '#' . esc($value['name']) : '' ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                     <div class="comments">
