@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-require_once('./helpers.php');
 $db_cfg = require_once('config/db.php');
 $db_cfg = array_values($db_cfg);
 

@@ -29,10 +29,10 @@ $user_details = get_user_details_by_id($con, $id) ?? [];
 
 $head = include_template('partials/head.php', ['title' => 'readme: публикация']);
 $symbols = include_template('partials/symbols.php');
-$page_header = include_template('partials/header.php', ['username' => 'Вася Попкин']);
+$page_header = include_template('partials/header.php');
 $page_content = include_template('partials/post_details/main.php', [
     'post' => array_merge([], ...array_filter($posts, function ($post) use ($id) {
-        return $post['id'] === $id;
+        return $post['id'] == $id;
     })),
     'hashtags' => $hashtags,
     'comments' => $comments,

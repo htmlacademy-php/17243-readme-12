@@ -1,13 +1,43 @@
 <?php
-function get_posts(mysqli $con): ?array
+function get_posts(mysqli $con, ?string $search = null, string $type = 'random'): ?array
 {
-    $sql = '
+    $fs_subquery = isset($search) ? '
+        WHERE
+            MATCH(title, body) AGAINST(?)
+    ' : '';
+
+    $posts_by_id_subquery = '
+        WHERE
+            p.id IN (
+                SELECT
+                    post_id
+                FROM
+                    posts_has_hashtags
+                WHERE
+                    hashtag_id = (
+                        SELECT
+                            id
+                        FROM
+                            hashtags
+                        WHERE
+                            name = ?
+                    )
+            )
+    ';
+
+    $subquery = $type === 'hashtag' ? $posts_by_id_subquery : $fs_subquery;
+
+    $sorting_rule = $type === 'hashtag' ? 'ORDER BY p.dt_add DESC' : '';
+
+    $sql = "
         SELECT
             p.id,
+            p.dt_add,
             p.original_post_id,
             p.user_id,
             p.title,
             p.body,
+            p.author_name,
             p.views_count,
             (SELECT COUNT(`id`) FROM comments c WHERE c.post_id = p.id) as comments_count,
             (SELECT COUNT(`id`) FROM likes l WHERE l.post_id = p.id) as likes_count,
@@ -17,10 +47,15 @@ function get_posts(mysqli $con): ?array
             LEFT JOIN content_types AS c1 ON p.content_type_id = c1.id
             LEFT JOIN comments AS c2 ON p.id = c2.post_id
             LEFT JOIN likes AS l ON p.id = l.post_id
-        GROUP BY p.id;
-    ';
+        $subquery
+        GROUP BY p.id
+        $sorting_rule;
 
-    $result = mysqli_query($con, $sql);
+    ";
+
+    $stmt = db_get_prepare_stmt($con, $sql, isset($search) ? [$search] : []);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
     if ($result) {
         $posts = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -41,6 +76,7 @@ function get_posts_by_id(mysqli $con, ?int $id): ?array
             p.id,
             p.title,
             p.body,
+            p.author_name,
             u.login AS username,
             u.avatar_path AS userpic
         FROM

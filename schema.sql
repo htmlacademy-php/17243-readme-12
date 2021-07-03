@@ -57,6 +57,8 @@ CREATE INDEX `fk_posts_user_idx` ON `readme`.`posts` (`user_id` ASC);
 
 CREATE INDEX `fk_posts_content_type_idx` ON `readme`.`posts` (`content_type_id` ASC);
 
+CREATE FULLTEXT INDEX post_ft_search ON posts(title, body);
+
 -- -----------------------------------------------------
 -- Table `readme`.`comments`
 -- -----------------------------------------------------

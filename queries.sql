@@ -19,13 +19,13 @@ VALUES
     'userpic-petro.jpg',
     'petro@cxmyal.com',
     'petro',
-    'YRuHGNIUeZhL'
+    '$2y$10$/VzZMLP4aG4ePc3QV2bxS.WKY0UxVfrTuatGyZYxB9jGV7cs2TWXS'
   ),
   (
     'userpic-larisa.jpg',
     'larisa@accebay.site',
     'larisa',
-    'bLJB0wrtsWTh'
+    '$2y$10$CSBgFnvp6OaWmFu/nLhwxeujnwnJhk3US0yQRhTRWkkphRQXrYL5C'
   );
 
 /* posts */
@@ -46,13 +46,13 @@ VALUES
   ),
   (
     'Наконец, обработал фотки!',
-    'rock-medium.jpg',
+    'rock-default.jpg',
     1,
     3
   ),
   (
     'Лучшие курсы',
-    'www.htmlacademy.ru',
+    'https://htmlacademy.ru',
     2,
     4
   ),
@@ -104,6 +104,18 @@ INSERT INTO
   subscriptions (subscriber_id, user_id)
 VALUES
   (1, 2);
+
+/* hashtags */
+INSERT INTO
+  hashtags (name)
+VALUES
+  ('мечта', 'приключениелета');
+
+/* posts_has_hashtags */
+INSERT INTO
+  posts_has_hashtags (post_id, hashtag_id)
+VALUES
+  (5, 1), (5, 2), (6, 1), (6, 2);
 
 -- -----------------------------------------------------
 -- Queries

@@ -2,9 +2,9 @@
     <div class="post__main">
         <blockquote>
             <p>
-                <?= $text; ?>
+            <?= isset($text) ? esc($text) : '' ?>
             </p>
-            <cite><?= $author; ?></cite>
+            <cite><?= isset($author) ? esc($author) : 'Неизвестный автор' ?></cite>
         </blockquote>
     </div>
 </div>

@@ -76,80 +76,28 @@
                         </a>
                     </header>
                     <div class="post__main">
-                        <!--здесь содержимое карточки-->
                         <?php if (isset($post['type'])) : ?>
                             <?php if ($post['type'] === 'post-quote') : ?>
-                                <blockquote>
-                                    <?php if (isset($post['body'])) : ?>
-                                        <?php [$text, $is_truncated] = truncate(esc($post['body'])) ?>
-                                        <p>
-                                            <?= $is_truncated ? $text . '&#8230;' : $text ?>
-                                        </p>
-                                        <?= $is_truncated ? '<a class="post-text__more-link" href="#">Читать далее</a>' : '' ?>
-                                    <?php endif; ?>
-                                    <cite>Неизвестный Автор</cite>
-                                </blockquote>
-
+                                <?= include_template('partials/popular/types/quote.php', ['text' => $post['body'], 'author' => $post['author_name']]) ?>
                             <?php elseif ($post['type'] === 'post-text') : ?>
-                                <?php if (isset($post['body'])) : ?>
-                                    <?php [$text, $is_truncated] = truncate(esc($post['body'])) ?>
-                                    <p>
-                                        <?= $is_truncated ? $text . '&#8230;' : $text ?>
-                                    </p>
-                                    <?= $is_truncated ? '<a class="post-text__more-link" href="#">Читать далее</a>' : '' ?>
-                                <?php endif; ?>
+                                <?= include_template('partials/popular/types/text.php', ['text' => $post['body']]) ?>
                             <?php elseif ($post['type'] === 'post-photo') : ?>
-                                <div class="post-photo__image-wrapper">
-                                    <img src="img/<?= esc($post['body']) ?? '' ?>" alt="Фото от пользователя" width="360" height="240">
-                                </div>
-
+                                <?= include_template('partials/popular/types/photo.php', ['img_url' => $post['body']]) ?>
                             <?php elseif ($post['type'] === 'post-link') : ?>
-                                <div class="post-link__wrapper">
-                                    <a class="post-link__external" href="http://<?= esc($post['body']) ?? '' ?>" title="Перейти по ссылке">
-                                        <div class="post-link__info-wrapper">
-                                            <div class="post-link__icon-wrapper">
-                                                <img src="https://www.google.com/s2/favicons?domain=vitadental.ru" alt="Иконка">
-                                            </div>
-                                            <div class="post-link__info">
-                                                <h3>
-                                                    <?= esc($post['title']) ?? '' ?>
-                                                </h3>
-                                            </div>
-                                        </div>
-                                        <span>
-                                            <?= esc($post['body']) ?? '' ?>
-                                        </span>
-                                    </a>
-                                </div>
-
+                                <?= include_template('partials/popular/types/link.php', ['url' => $post['body'], 'title' => $post['title']]) ?>
                             <?php elseif ($post['type'] === 'post-video') : ?>
-                                <div class="post-video__block">
-                                    <div class="post-video__preview">
-                                        <?= embed_youtube_cover(esc($post['body']) ?? '') ?>
-
-                                    </div>
-                                    <a href="post-details.html" class="post-video__play-big button">
-                                        <svg class="post-video__play-big-icon" width="14" height="14">
-                                            <use xlink:href="#icon-video-play-big"></use>
-                                        </svg>
-                                        <span class="visually-hidden">Запустить проигрыватель</span>
-                                    </a>
-                                </div>
-
+                                <?= include_template('partials/popular/types/video.php', ['youtube_url' => $post['body']]) ?>
                             <?php endif; ?>
                         <?php endif; ?>
-
                     </div>
                     <footer class="post__footer">
                         <div class="post__author">
                             <a class="post__author-link" href="#" title="Автор">
                                 <div class="post__avatar-wrapper">
-                                    <!--укажите путь к файлу аватара-->
                                     <img class="post__author-avatar" src="img/<?= $post['userpic'] ?? '' ?>" alt="Аватар пользователя">
                                 </div>
                                 <div class="post__info">
                                     <b class="post__author-name">
-                                        <!--здесь имя пользоателя-->
                                         <?= $post['username'] ?? '' ?>
                                     </b>
                                     <?php $random_date = generate_random_date($key) ?>

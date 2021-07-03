@@ -71,7 +71,7 @@ function validate_max(array $input_array, string $parameter_name, ?string $form_
 
 function is_tag_syntax_valid(string $hashtag): bool
 {
-    $regex = '/^#[А-Яа-яA-Za-z_]+$/u';
+    $regex = '/^[а-яa-z]+$/u';
     $result = preg_match($regex, $hashtag, $matches);
 
     return boolval($result);
@@ -95,7 +95,7 @@ function validate_tags(array $input_array, string $parameter_name, ?string $form
     if (empty($filtered)) {
         $label = isset($form_field_label) ? "$form_field_label: " : '';
 
-        return "{$label}}Тег должен начинаться с&nbsp;символа решетки (#), может содержать только латинские и&nbsp;кириллические символы, а&nbsp;также символ нижнего подчеркивания (_)";
+        return "{$label}}Тег может содержать только латинские и&nbsp;кириллические символы в нижнем регистре";
     }
 
     return null;
