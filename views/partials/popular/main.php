@@ -69,24 +69,30 @@
             <?php foreach ($posts as $key => $post) : ?>
                 <article class="popular__post post <?= $post['type'] ?? '' ?>">
                     <header class="post__header">
-                        <a href="/post.php?id=<?= $post['id'] ?>">
-                            <h2>
-                                <?= esc($post['title']) ?? '' ?>
-                            </h2>
-                        </a>
+                        <h2>
+                            <a href="/post.php?id=<?= $post['id'] ?>"><?= esc($post['title']) ?? '' ?></a>
+                        </h2>
                     </header>
                     <div class="post__main">
                         <?php if (isset($post['type'])) : ?>
                             <?php if ($post['type'] === 'post-quote') : ?>
-                                <?= include_template('partials/popular/types/quote.php', ['text' => $post['body'], 'author' => $post['author_name']]) ?>
+                                <?= include_template('partials/post_types/quote.php', [
+                                    'text' => $post['body'] ?? null,
+                                    'author' => $post['author_name'] ?? null
+                                ]) ?>
                             <?php elseif ($post['type'] === 'post-text') : ?>
-                                <?= include_template('partials/popular/types/text.php', ['text' => $post['body']]) ?>
+                                <?= include_template('partials/post_types/text.php', ['text' => $post['body'] ?? null]) ?>
                             <?php elseif ($post['type'] === 'post-photo') : ?>
-                                <?= include_template('partials/popular/types/photo.php', ['img_url' => $post['body']]) ?>
+                                <?= include_template('partials/post_types/photo.php', ['img_url' => $post['body'] ?? null]) ?>
                             <?php elseif ($post['type'] === 'post-link') : ?>
-                                <?= include_template('partials/popular/types/link.php', ['url' => $post['body'], 'title' => $post['title']]) ?>
+                                <?= include_template('partials/post_types/link.php', [
+                                    'url' => $post['body'] ?? null,
+                                    'title' => $post['title'] ?? null,
+                                    'url_desc' => $post['url_desc'] ?? null,
+                                    'mode' => 'preview'
+                                ]) ?>
                             <?php elseif ($post['type'] === 'post-video') : ?>
-                                <?= include_template('partials/popular/types/video.php', ['youtube_url' => $post['body']]) ?>
+                                <?= include_template('partials/post_types/video.php', ['youtube_url' => $post['body'] ?? null]) ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -101,7 +107,8 @@
                                         <?= $post['username'] ?? '' ?>
                                     </b>
                                     <?php $random_date = generate_random_date($key) ?>
-                                    <time class="post__time" title="<?= date_format(date_create($random_date), 'd-m-Y H:i') ?>" datetime="<?= $random_date ?>"><?= get_human_readable_date($random_date) . '&nbsp;' . 'назад' ?></time>
+                                    <time class="post__time" title="<?= date_format(date_create($random_date), 'd-m-Y H:i') ?>" datetime="<?= $random_date ?>"><?= get_human_readable_date($random_date) . '&nbsp;' . 'назад' ?>
+                                    </time>
                                 </div>
                             </a>
                         </div>
