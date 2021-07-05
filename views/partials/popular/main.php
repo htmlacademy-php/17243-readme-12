@@ -41,7 +41,7 @@
                             filters__button
                             filters__button--ellipse filters__button--all
                             <?= is_null($params['content_type_id']) ? 'filters__button--active' : '' ?>
-                            " href="/index.php">
+                            " href="popular.php">
                             <span>Все</span>
                         </a>
                     </li>
@@ -52,7 +52,7 @@
                                 <?= $content_type['classname'] ? 'filters__button--' . esc($content_type['classname']) : '' ?>
                                 <?= !is_null($params['content_type_id']) && $content_type['id'] === $params['content_type_id'] ? 'filters__button--active' : '' ?>
                                 button
-                                " href="/index.php?id=<?= $content_type['id'] ?>">
+                                " href="popular.php?id=<?= $content_type['id'] ?>">
                                 <span class="visually-hidden"><?= esc($content_type['name']) ?? '' ?></span>
                                 <?php if ($content_type['classname']) : ?>
                                     <svg class="filters__icon" width="24" height="100%">

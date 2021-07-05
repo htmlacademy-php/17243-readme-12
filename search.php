@@ -1,14 +1,20 @@
 <?php
 require_once('./helpers.php');
 require_once('./config/init.php');
+require_once('./const.php');
 require_once('./models/posts.php');
 require_once('./models/users.php');
 
-$posts = get_posts($con, $_GET['q'], $_GET['type']) ?? [];
+$posts = get_posts(
+    $con,
+    $SEARCH_TYPES,
+    $_GET['type'],
+    $_GET['q']
+) ?? [];
 
 if (count($posts)) {
     $posts = array_map(function ($post) use ($con) {
-        $user_details = isset($post['id']) ? get_user_details_by_id($con, $post['id']) : [];
+        $user_details = isset($post['id']) ? get_user_details_by_post_id($con, $post['id']) : [];
         return array_merge(
             $post,
             array_filter(

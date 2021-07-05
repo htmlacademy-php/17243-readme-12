@@ -103,7 +103,7 @@ VALUES
 INSERT INTO
   subscriptions (subscriber_id, user_id)
 VALUES
-  (1, 2);
+  (1, 2), (2, 1);
 
 /* hashtags */
 INSERT INTO

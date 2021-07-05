@@ -38,7 +38,7 @@ function validate_user(array $input_array, array $validators, array $labels): ar
 function validate_user_credentials(mysqli $con, array $input_array): array
 {
     $errors = [];
-    $user = get_user($con, 'login', $input_array['login']);
+    $user = get_user_by_field($con, 'login', $input_array['login']);
 
     if ($user) {
         if (!password_verify($input_array['password'], $user['password'])) {

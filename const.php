@@ -76,3 +76,60 @@ $FORM_FIELDS_LABELS = [
         'userpic-file' => 'Фото'
     ]
 ];
+
+$SEARCH_TYPES = [
+    'random_words' => function (?array $list): string {
+        if (empty($list)) {
+            return '';
+        }
+
+        return '
+            WHERE
+                MATCH(title, body) AGAINST(?)
+            ';
+    },
+    'hashtag' => function (?array $list): string {
+        return '
+            WHERE
+                p.id IN (
+                    SELECT
+                        post_id
+                    FROM
+                        posts_has_hashtags
+                    WHERE
+                        hashtag_id = (
+                            SELECT
+                                id
+                            FROM
+                                hashtags
+                            WHERE
+                                name = ?
+                        )
+                )
+            ';
+    },
+    'subscriptions' => function (?array $list): string {
+        $subquery = '
+            WHERE
+                p.user_id IN (
+                    SELECT
+                        user_id
+                    FROM
+                        subscriptions
+                    WHERE
+                        subscriber_id = ?
+                )
+            ';
+
+        [, $content_type_id] = $list + array_fill(1, 1, null);
+
+        if (isset($content_type_id)) {
+
+            if ($content_type_id != 0) {
+                $subquery = $subquery . 'AND' . ' ' . 'c1.id = ?';
+            }
+        }
+
+        return $subquery;
+    }
+];

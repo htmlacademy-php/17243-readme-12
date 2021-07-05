@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 
 $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
 $content_types = get_content_types($con) ?? [];
-$posts = get_posts_by_id($con, $id) ?? [];
+$posts = get_posts_by_content_type_id($con, $id) ?? [];
 
 $head = include_template('partials/head.php', ['title' => 'readme: популярное']);
 $symbols = include_template('partials/symbols.php');

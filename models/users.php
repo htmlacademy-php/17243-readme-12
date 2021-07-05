@@ -1,7 +1,7 @@
 <?php
 require_once('./helpers.php');
 
-function get_user_details_by_id(mysqli $con, int $id): ?array
+function get_user_details_by_post_id(mysqli $con, int $id): ?array
 {
     $sql = "
         SELECT
@@ -32,7 +32,6 @@ function get_user_details_by_id(mysqli $con, int $id): ?array
 
     $stmt = db_get_prepare_stmt($con, $sql, [$id]);
     mysqli_stmt_execute($stmt);
-
     $result = mysqli_stmt_get_result($stmt);
 
     if ($result) {
@@ -44,17 +43,47 @@ function get_user_details_by_id(mysqli $con, int $id): ?array
     return null;
 }
 
-function get_user(mysqli $con, string $field_name, string $value): ?array
+function get_user_by_id(mysqli $con, int $id): ?array
+{
+    if (is_null($id)) {
+        return null;
+    }
+
+    $sql = "
+        SELECT
+            *
+        FROM
+            users
+        WHERE
+            id = ?
+    ";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$id]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if ($result) {
+        $user = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+        return $user;
+    }
+
+    return null;
+}
+
+function get_user_by_field(mysqli $con, string $field_name, string $value): ?array
 {
     $esc_value = mysqli_real_escape_string($con, $value);
+
     $sql = "
-    SELECT
-        *
-    FROM
-        users
-    WHERE
-        $field_name = '$esc_value'
+        SELECT
+            *
+        FROM
+            users
+        WHERE
+            $field_name = '$esc_value'
     ";
+
     $res = mysqli_query($con, $sql);
 
     return $res ? mysqli_fetch_array($res, MYSQLI_ASSOC) : null;
@@ -77,13 +106,16 @@ function create_user(mysqli $con, array $form_data): bool
         VALUES
             (NOW(), ?, ?, ?, ?)
     ";
-    $stmt = db_get_prepare_stmt($con, $sql,
-    [
-        $email,
-        $login,
-        $password,
-        $is_userpic_exist ? $form_data['userpic-file']['name'] : null
-    ]);
+    $stmt = db_get_prepare_stmt(
+        $con,
+        $sql,
+        [
+            $email,
+            $login,
+            $password,
+            $is_userpic_exist ? $form_data['userpic-file']['name'] : null
+        ]
+    );
     $res = mysqli_stmt_execute($stmt);
 
     return $res;

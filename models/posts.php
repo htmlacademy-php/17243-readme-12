@@ -1,46 +1,40 @@
 <?php
-function get_posts(mysqli $con, ?string $search = null, string $type = 'random'): ?array
-{
-    $fs_subquery = isset($search) ? '
-        WHERE
-            MATCH(title, body) AGAINST(?)
-    ' : '';
+function get_posts(
+    mysqli $con,
+    array $search_types,
+    string $search_type,
+    ...$params
+): ?array {
+    $subquery = $search_types[$search_type]($params);
 
-    $posts_by_id_subquery = '
-        WHERE
-            p.id IN (
-                SELECT
-                    post_id
-                FROM
-                    posts_has_hashtags
-                WHERE
-                    hashtag_id = (
-                        SELECT
-                            id
-                        FROM
-                            hashtags
-                        WHERE
-                            name = ?
-                    )
-            )
-    ';
-
-    $subquery = $type === 'hashtag' ? $posts_by_id_subquery : $fs_subquery;
-
-    $sorting_rule = $type === 'hashtag' ? 'ORDER BY p.dt_add DESC' : '';
+    $sorting_rule = $search_type !== 'random_words' ? 'ORDER BY p.dt_add DESC' : '';
 
     $sql = "
         SELECT
             p.id,
             p.dt_add,
-            p.original_post_id,
             p.user_id,
             p.title,
             p.body,
             p.author_name,
+            p.url_desc,
             p.views_count,
-            (SELECT COUNT(`id`) FROM comments c WHERE c.post_id = p.id) as comments_count,
-            (SELECT COUNT(`id`) FROM likes l WHERE l.post_id = p.id) as likes_count,
+            (
+                SELECT
+                    COUNT(`id`)
+                FROM
+                    comments c
+                WHERE
+                    c.post_id = p.id
+            ) as comments_count,
+            (
+                SELECT
+                    COUNT(`id`)
+                FROM
+                    likes l
+                WHERE
+                    l.post_id = p.id
+            ) as likes_count,
             c1.classname AS type
         FROM
             posts AS p
@@ -53,7 +47,7 @@ function get_posts(mysqli $con, ?string $search = null, string $type = 'random')
 
     ";
 
-    $stmt = db_get_prepare_stmt($con, $sql, isset($search) ? [$search] : []);
+    $stmt = db_get_prepare_stmt($con, $sql, !empty($params) ? array_filter($params) : []);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
@@ -66,17 +60,19 @@ function get_posts(mysqli $con, ?string $search = null, string $type = 'random')
     return null;
 }
 
-function get_posts_by_id(mysqli $con, ?int $id): ?array
+function get_posts_by_content_type_id(mysqli $con, ?int $id): ?array
 {
-    $subquery = is_null($id) ? "p.content_type_id = c.id" : "p.id = $id";
+    $subquery = is_null($id) ? "p.content_type_id = c.id" : "p.content_type_id = $id";
 
     $sql = "
         SELECT
             c.classname,
             p.id,
+            p.dt_add,
             p.title,
             p.body,
             p.author_name,
+            p.url_desc,
             u.login AS username,
             u.avatar_path AS userpic
         FROM
@@ -108,28 +104,142 @@ function get_posts_by_id(mysqli $con, ?int $id): ?array
 
 function add_post(mysqli $con, array $form_data): bool
 {
-    $post_sql = '
+    $sql = '
         INSERT INTO
             posts (
                 dt_add,
-                user_id,
                 views_count,
+                user_id,
                 title,
                 body,
                 content_type_id,
-                author_name
+                author_name,
+                p.url_desc
             )
         VALUES
-            (NOW(), 1, 0, ?, ?, ?, ?)
+            (NOW(), 0, ?, ?, ?, ?, ?, ?)
     ';
 
     $stmt = db_get_prepare_stmt(
         $con,
-        $post_sql,
-        [$form_data['title'], $form_data['body'], $form_data['content_type_id'], $form_data['author_name'] ?? null]
+        $sql,
+        [
+            $_SESSION['user']['id'],
+            $form_data['title'],
+            $form_data['body'],
+            $form_data['content_type_id'],
+            $form_data['author_name'] ?? null
+        ]
     );
 
     $res = mysqli_stmt_execute($stmt);
 
     return $res;
+}
+
+function get_reposts_count(mysqli $con, ?int $id): int
+{
+    $count = 0;
+
+    if (is_null($id)) {
+        return $count;
+    }
+
+    $sql = '
+        SELECT
+            COUNT(p.original_post_id) AS reposts_count
+        FROM
+            posts AS p
+        WHERE
+            p.original_post_id = ?
+        GROUP BY
+            p.original_post_id
+    ';
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$id]);
+    mysqli_stmt_execute($stmt);
+    $query_result = mysqli_stmt_get_result($stmt);
+
+    if ($query_result) {
+        $data = mysqli_fetch_array($query_result, MYSQLI_ASSOC);
+
+        if (empty($data)) {
+            return $count;
+        } else {
+            ['reposts_count' => $count] = $data;
+
+            return $count;
+        }
+    }
+
+    return $count;
+}
+
+function make_repost(mysqli $con, ?int $post_id, ?int $user_id): void
+{
+    $sql = '
+        SELECT
+        *
+        FROM
+            posts AS p
+        WHERE
+            p.id = ?
+            AND p.id NOT IN (
+                SELECT
+                    p.original_post_id
+                FROM
+                    posts p
+                WHERE
+                    p.user_id = ?
+                    AND p.original_post_id IS NOT NULL
+            )
+    ';
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$post_id, $user_id]);
+    mysqli_stmt_execute($stmt);
+    $query_result = mysqli_stmt_get_result($stmt);
+
+    if ($query_result) {
+        $post = mysqli_fetch_array($query_result, MYSQLI_ASSOC);
+
+        if (!empty($post)) {
+            $sql = '
+                INSERT INTO
+                    posts (
+                        dt_add,
+                        original_post_id,
+                        title,
+                        body,
+                        views_count,
+                        user_id,
+                        content_type_id,
+                        author_name,
+                        url_desc
+                    )
+                VALUES
+                    (NOW(), ?, ?, ?, ?, ?, ?, ?, ?)
+    ';
+
+            $stmt = db_get_prepare_stmt(
+                $con,
+                $sql,
+                [
+                    $post_id,
+                    $post['title'],
+                    $post['body'],
+                    $post['views_count'],
+                    $_SESSION['user']['id'],
+                    $post['content_type_id'],
+                    $post['author_name'] ?? null,
+                    $post['url_desc'] ?? null
+                ]
+            );
+
+            $query_result = mysqli_stmt_execute($stmt);
+
+            if ($query_result) {
+                header("Location: /profile.php");
+            }
+        }
+    }
 }
