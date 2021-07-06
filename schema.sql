@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `readme`.`posts` (
   `title` TEXT NOT NULL,
   `body` TEXT NULL,
   `author_name` TEXT,
+  `url_desc` TEXT,
   `views_count` INT NULL DEFAULT 0,
   `user_id` INT NOT NULL,
   `content_type_id` INT NOT NULL,

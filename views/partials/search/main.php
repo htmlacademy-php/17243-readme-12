@@ -38,17 +38,26 @@
                                         </a>
                                     </header>
                                     <div class="post__main">
-
                                         <?php if ($post['type'] === 'quote') : ?>
-                                            <?= include_template('partials/search/types/quote.php', ['text' => $post['body'], 'author' => $post['author_name']]) ?>
+                                            <?= include_template('partials/post_types/quote.php', [
+                                                'text' => $post['body'] ?? null,
+                                                'author' => $post['author_name'] ?? null
+                                            ]) ?>
                                         <?php elseif ($post['type'] === 'text') : ?>
-                                            <?= include_template('partials/search/types/text.php',  ['text' => $post['body'], 'title' => $post['title']]) ?>
+                                            <?= include_template('partials/post_types/text.php',  [
+                                                'text' => $post['body'] ?? null,
+                                                'title' => $post['title'] ?? null
+                                            ]) ?>
                                         <?php elseif ($post['type'] === 'photo') : ?>
-                                            <?= include_template('partials/search/types/photo.php', ['img_url' => $post['body']]) ?>
+                                            <?= include_template('partials/post_types/photo.php', ['img_url' => $post['body'] ?? null]) ?>
                                         <?php elseif ($post['type'] === 'link') : ?>
-                                            <?= include_template('partials/search/types/link.php', ['url' => $post['body'], 'title' => $post['title']]) ?>
+                                            <?= include_template('partials/post_types/link.php', [
+                                                'url' => $post['body'] ?? null,
+                                                'title' => $post['title'] ?? null,
+                                                'url_desc' => $post['url_desc'] ?? null
+                                            ]) ?>
                                         <?php elseif ($post['type'] === 'video') : ?>
-                                            <?= include_template('partials/search/types/video.php', ['youtube_url' => $post['body']]) ?>
+                                            <?= include_template('partials/post_types/video.php', ['youtube_url' => $post['body'] ?? null]) ?>
                                         <?php endif; ?>
                                     </div>
                                     <footer class="post__footer post__indicators">

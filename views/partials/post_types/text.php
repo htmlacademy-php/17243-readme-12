@@ -1,4 +1,6 @@
-<h2><a href="#"><?= isset($title) ? esc($title) : '' ?></a></h2>
+<?php if (isset($title)) : ?>
+    <h2><a href="#"><?= esc($title) ?></a></h2>
+<?php endif; ?>
 <?php if (isset($text)) : ?>
     <?php [$txt, $is_truncated] = truncate(esc($text)) ?>
     <p>

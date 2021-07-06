@@ -1,25 +1,34 @@
 <main class="page__main page__main--publication">
     <div class="container">
         <h1 class="page__title page__title--publication">
-            <?= esc($post['title']) ?>
+            <?= esc($post['title']) ?? '' ?>
         </h1>
         <section class="post-details">
             <h2 class="visually-hidden">Публикация</h2>
-            <div class="post-details__wrapper post-photo">
+            <div class="post-details__wrapper <?= isset($post['type']) ? 'post-' . $post['type'] : '' ?>">
                 <div class="post-details__main-block post post--details">
-                    <?php if (isset($post['type'])) : ?>
-                        <?php if ($post['type'] === 'quote') : ?>
-                            <?= include_template('partials/post_details/types/quote.php', ['text' => $post['body'], 'author' => $post['author_name']]) ?>
-                        <?php elseif ($post['type'] === 'text') : ?>
-                            <?= include_template('partials/post_details/types/text.php',  ['text' => $post['body']]) ?>
-                        <?php elseif ($post['type'] === 'photo') : ?>
-                            <?= include_template('partials/post_details/types/photo.php', ['img_url' => $post['body']]) ?>
-                        <?php elseif ($post['type'] === 'link') : ?>
-                            <?= include_template('partials/post_details/types/link.php', ['url' => $post['body'], 'title' => $post['title']]) ?>
-                        <?php elseif ($post['type'] === 'video') : ?>
-                            <?= include_template('partials/post_details/types/video.php', ['youtube_url' => $post['body']]) ?>
+                    <div class="post__main">
+                        <?php if (isset($post['type'])) : ?>
+                            <?php if ($post['type'] === 'quote') : ?>
+                                <?= include_template('partials/post_types/quote.php', [
+                                    'text' => $post['body'] ?? null,
+                                    'author' => $post['author_name'] ?? null
+                                ]) ?>
+                            <?php elseif ($post['type'] === 'text') : ?>
+                                <?= include_template('partials/post_types/text.php',  ['text' => $post['body'] ?? null]) ?>
+                            <?php elseif ($post['type'] === 'photo') : ?>
+                                <?= include_template('partials/post_types/photo.php', ['img_url' => $post['body'] ?? null]) ?>
+                            <?php elseif ($post['type'] === 'link') : ?>
+                                <?= include_template('partials/post_types/link.php', [
+                                    'url' => $post['body'] ?? null,
+                                    'title' => $post['title'] ?? null,
+                                    'url_desc' => $post['url_desc'] ?? null
+                                ]) ?>
+                            <?php elseif ($post['type'] === 'video') : ?>
+                                <?= include_template('partials/post_types/video.php', ['youtube_url' => $post['body'] ?? null]) ?>
+                            <?php endif; ?>
                         <?php endif; ?>
-                    <?php endif; ?>
+                    </div>
                     <div class="post__indicators">
                         <div class="post__buttons">
                             <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
@@ -31,21 +40,21 @@
                       " width="20" height="17">
                                     <use xlink:href="#icon-heart-active"></use>
                                 </svg>
-                                <span><?= $post['likes_count'] ?></span>
+                                <span><?= $post['likes_count'] ?? '' ?></span>
                                 <span class="visually-hidden">количество лайков</span>
                             </a>
                             <a class="post__indicator post__indicator--comments button" href="#" title="Комментарии">
                                 <svg class="post__indicator-icon" width="19" height="17">
                                     <use xlink:href="#icon-comment"></use>
                                 </svg>
-                                <span><?= $post['comments_count'] ?></span>
+                                <span><?= $post['comments_count'] ?? '' ?></span>
                                 <span class="visually-hidden">количество комментариев</span>
                             </a>
                             <a class="post__indicator post__indicator--repost button" href="#" title="Репост">
                                 <svg class="post__indicator-icon" width="19" height="17">
                                     <use xlink:href="#icon-repost"></use>
                                 </svg>
-                                <span><?= $post['original_post_id'] ?></span>
+                                <span><?= $post['original_post_id'] ?? '' ?></span>
                                 <span class="visually-hidden">количество репостов</span>
                             </a>
                         </div>
@@ -115,7 +124,7 @@
                             <?php if (isset($user_details['userpic'])) : ?>
                                 <div class="post-details__avatar user__avatar">
                                     <a class="post-details__avatar-link user__avatar-link" href="#">
-                                        <img class="post-details__picture user__picture" src="img/<?= esc($user_details['userpic']) ?>" alt="Аватар пользователя" />
+                                        <img class="post-details__picture user__picture" src="uploads/<?= esc($user_details['userpic']) ?>" alt="Аватар пользователя" />
                                     </a>
                                 </div>
                             <?php endif; ?>
