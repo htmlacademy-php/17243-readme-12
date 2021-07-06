@@ -60,9 +60,12 @@ function get_posts(
     return null;
 }
 
-function get_posts_by_content_type_id(mysqli $con, ?int $id): ?array
+function get_popular_posts(mysqli $con, ...$params): ?array
 {
+    [$id, $limit_value, $offset_value] = $params + array_fill(0, 3, null);
     $subquery = is_null($id) ? "p.content_type_id = c.id" : "p.content_type_id = $id";
+    $limit = isset($limit_value) ? 'LIMIT ' . $limit_value : '';
+    $offset = isset($offset_value) ? ' OFFSET ' . $offset_value : '';
 
     $sql = "
         SELECT
@@ -82,6 +85,8 @@ function get_posts_by_content_type_id(mysqli $con, ?int $id): ?array
         WHERE $subquery
         ORDER BY
             views_count DESC
+        $limit
+        $offset
     ";
 
     $result = mysqli_query($con, $sql);
@@ -100,6 +105,20 @@ function get_posts_by_content_type_id(mysqli $con, ?int $id): ?array
     }
 
     return null;
+}
+
+function get_posts_count(mysqli $con): int
+{
+    $result = mysqli_query(
+        $con, '
+        SELECT
+            COUNT(*) as cnt
+        FROM
+            posts
+    ');
+    $items_count = mysqli_fetch_assoc($result);
+
+    return $items_count['cnt'] ?? 0;
 }
 
 function add_post(mysqli $con, array $form_data): bool

@@ -3411,6 +3411,10 @@ img {
   text-align: center;
   letter-spacing: 0.8px;
 }
+.popular__page-link--disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+}
 .sorting__caption {
   margin-right: 26px;
   font-size: 17px;
